@@ -37,8 +37,9 @@ class Graphics3D {
     vertex: null,
     index: null,
   };
+  #userInputs;
   
-  constructor(canvas) {
+  constructor(canvas, userInputs = {}) {
     const gl = Graphics3D.#getGL(canvas);
     if (!gl) {
       throw 'Unable to get WebGL context';
@@ -48,6 +49,10 @@ class Graphics3D {
     this.#program = this.#createProgram(vertexSourceMain, fragmentSourceMain);
     for (const name in this.#locations.attribute) {
       this.#locations.attribute[name] = gl.getAttribLocation(this.#program, name);
+    }
+    this.#userInputs = userInputs;
+    for (const name in userInputs) {
+      this.#locations.uniform[name] = null;
     }
     for (const name in this.#locations.uniform) {
       this.#locations.uniform[name] = gl.getUniformLocation(this.#program, name);
@@ -97,6 +102,12 @@ class Graphics3D {
       this.#locations.uniform.uTime,
       timestamp
     );
+    for (const name in this.#userInputs) {
+      gl.uniform1f(
+        this.#locations.uniform[name],
+        this.#userInputs[name]
+      );
+    }
     
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.#buffers.index);
     gl.drawElements(

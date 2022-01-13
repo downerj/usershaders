@@ -1,9 +1,13 @@
 class Application {
   #graphics;
   #timer = new IntervalTimer(this.#onTick.bind(this), 10);
+  userInputs = {
+    uSpread: 0.005,
+    uSpeed: 0.00025,
+  };
   
   constructor(canvas) {
-    this.#graphics = new Graphics3D(canvas);
+    this.#graphics = new Graphics3D(canvas, this.userInputs);
   }
   
   run() {
@@ -20,6 +24,7 @@ class Application {
   }
 }
 
+let app;
 window.addEventListener('load', () => {
   const cvs = document.getElementById('cvs');
   
@@ -30,6 +35,6 @@ window.addEventListener('load', () => {
   window.addEventListener('resize', window_onResize);
   window_onResize();
   
-  const app = new Application(cvs);
+  app = new Application(cvs);
   app.run();
 });

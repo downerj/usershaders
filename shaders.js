@@ -29,8 +29,9 @@ vec3 hsv2rgb(in vec3 hsv) {
 uniform vec2 uResolution;
 uniform float uTime;
 
-const float spread = 0.005;
-const float speed = 0.0001;
+// User inputs.
+uniform float uSpread;
+uniform float uSpeed;
 
 void setColor(out vec4 fragColor, in vec4 fragCoord) {
   float w = uResolution.x;
@@ -40,7 +41,7 @@ void setColor(out vec4 fragColor, in vec4 fragCoord) {
   float xp = x - w*0.5;
   float yp = y - h*0.5;
   float value = sqrt(xp*xp + yp*yp);
-  float hue = mod(value * spread + uTime * speed, 360.0);
+  float hue = mod(value * uSpread + uTime * uSpeed, 360.0);
   vec3 rgb = hsv2rgb(vec3(hue, 1.0, 1.0));
   fragColor = vec4(rgb, 1.0);
 }
