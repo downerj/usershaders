@@ -24,14 +24,45 @@ class Graphics3D {
   
   #gl;
   #program;
+  #locations = {
+    attribute: {
+      inPosition: null,
+    },
+    uniform: {
+      uResolution: null,
+      uTime: null,
+    },
+  };
+  #buffers = {
+    vertex: null,
+    index: null,
+  };
   
   constructor(canvas) {
-    this.#gl = Graphics3D.#getGL(canvas);
-    if (!this.#gl) {
+    const gl = Graphics3D.#getGL(canvas);
+    if (!gl) {
       throw 'Unable to get WebGL context';
     }
+    this.#gl = gl;
     
     this.#program = this.#createProgram(vertexSourceMain, fragmentSourceMain);
+    for (const name in this.#locations.attribute) {
+      this.#locations.attribute[name] = gl.getAttribLocation(this.#program, name);
+    }
+    for (const name in this.#locations.uniform) {
+      this.#locations.uniform[name] = gl.getUniformLocation(this.#program, name);
+    }
+    
+    this.#buffers.vertex = this.#createBuffer(
+      gl.ARRAY_BUFFER,
+      Graphics3D.#surface.vertices,
+      gl.STATIC_DRAW
+    );
+    this.#buffers.index = this.#createBuffer(
+      gl.ELEMENT_ARRAY_BUFFER,
+      Graphics3D.#surface.indices,
+      gl.STATIC_DRAW
+    );
   }
   
   render(timestamp) {
@@ -41,6 +72,39 @@ class Graphics3D {
     gl.clearDepth(1.0);
     gl.clear(gl.COLOR_BUFFER_BIT);
     gl.viewport(0, 0, gl.canvas.clientWidth, gl.canvas.clientHeight);
+    
+    gl.useProgram(this.#program);
+    
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.#buffers.vertex);
+    gl.vertexAttribPointer(
+      this.#locations.attribute.inPosition,
+      2,
+      gl.FLOAT,
+      false,
+      0,
+      0
+    );
+    gl.enableVertexAttribArray(this.#locations.attribute.inPosition);
+    
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+    
+    gl.uniform2f(
+      this.#locations.uniform.uResolution,
+      gl.canvas.clientWidth,
+      gl.canvas.clientHeight
+    );
+    gl.uniform1f(
+      this.#locations.uniform.uTime,
+      timestamp
+    );
+    
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.#buffers.index);
+    gl.drawElements(
+      gl.TRIANGLES,
+      Graphics3D.#surface.indices.length,
+      gl.UNSIGNED_SHORT,
+      0
+    );
   }
   
   #createShader(type, source) {
