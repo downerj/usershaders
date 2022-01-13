@@ -1,9 +1,9 @@
 class Application {
-  #canvas;
+  #graphics;
   #timer = new IntervalTimer(this.#onTick.bind(this), 10);
   
   constructor(canvas) {
-    this.#canvas = canvas;
+    this.#graphics = new Graphics3D(canvas);
   }
   
   run() {
@@ -15,6 +15,7 @@ class Application {
   }
   
   #onTick(timestamp) {
+    this.#graphics.render(timestamp);
     return true;
   }
 }
