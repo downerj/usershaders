@@ -38,7 +38,7 @@ uniform struct {
 } user;
 
 void setColor(out vec4 fragColor, in vec4 fragCoord) {
-  vec2 p = fragCoord.xy - mouse;
+  vec2 p = fragCoord.xy - resolution*0.5;
 
   // Diagonal lines.
   // float value = p.y - p.x;
