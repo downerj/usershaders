@@ -36,8 +36,12 @@ uniform float speed;
 void setColor(out vec4 fragColor, in vec4 fragCoord) {
   vec2 p = fragCoord.xy - resolution*0.5;
 
-  float value = sqrt(p.x*p.x + p.y*p.y);
+  // Circle.
+  // float value = sqrt(p.x*p.x + p.y*p.y);
   
+  // Hyperbolas.
+  float value = sqrt(abs(p.x*p.x - p.y*p.y));
+
   float hue = mod(value*spread + time*speed, 360.0);
   vec3 rgb = hsv2rgb(vec3(hue, 1.0, 1.0));
   fragColor = vec4(rgb, 1.0);
