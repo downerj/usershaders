@@ -1,6 +1,7 @@
 class Application {
   #graphics;
   #timer = new IntervalTimer(this.#onTick.bind(this), 10);
+  mouse = {x: 0, y: 0};
   userInputs = {
     a: 0.005,
     b: 0.00025,
@@ -10,7 +11,7 @@ class Application {
   };
   
   constructor(canvas) {
-    this.#graphics = new Graphics3D(canvas, this.userInputs);
+    this.#graphics = new Graphics3D(canvas, this.mouse, this.userInputs);
   }
   
   run() {
@@ -19,6 +20,11 @@ class Application {
   
   pause() {
     this.#timer.suspend();
+  }
+
+  mouseMove(x, y) {
+    this.mouse.x = x;
+    this.mouse.y = y;
   }
   
   #onTick(timestamp) {
@@ -37,7 +43,13 @@ window.addEventListener('load', () => {
   }
   window.addEventListener('resize', window_onResize);
   window_onResize();
+
+  function cvs_onMouseMove(event) {
+    app.mouseMove(event.clientX, event.clientY);
+  }
+  cvs.addEventListener('mousemove', cvs_onMouseMove);
   
   app = new Application(cvs);
   app.run();
 });
+

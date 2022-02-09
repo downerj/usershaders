@@ -28,8 +28,7 @@ vec3 hsv2rgb(in vec3 hsv) {
 
 uniform vec2 resolution;
 uniform float time;
-
-// User inputs.
+uniform vec2 mouse;
 uniform struct {
   float a;
   float b;

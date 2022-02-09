@@ -46,19 +46,22 @@ class Graphics3D {
     index: null,
   };
   #userInputs;
+  #mouse;
   
-  constructor(canvas, userInputs = {}) {
+  constructor(canvas, mouse, userInputs) {
     const gl = Graphics3D.#getGL(canvas);
     if (!gl) {
       throw 'Unable to get WebGL context';
     }
     this.#gl = gl;
+    this.#mouse = mouse;
     
     this.#program = this.#createProgram(vertexSourceMain, fragmentSourceMain);
     this.#userInputs = userInputs;
     this.#locations.attribute.position = gl.getAttribLocation(this.#program, 'position');
-    this.#locations.uniform.time = gl.getUniformLocation(this.#program, 'time');
     this.#locations.uniform.resolution = gl.getUniformLocation(this.#program, 'resolution');
+    this.#locations.uniform.time = gl.getUniformLocation(this.#program, 'time');
+    this.#locations.uniform.mouse = gl.getUniformLocation(this.#program, 'mouse');
     this.#locations.uniform.user.a = gl.getUniformLocation(this.#program, 'user.a');
     this.#locations.uniform.user.b = gl.getUniformLocation(this.#program, 'user.b');
     this.#locations.uniform.user.c = gl.getUniformLocation(this.#program, 'user.c');
@@ -108,6 +111,11 @@ class Graphics3D {
     gl.uniform1f(
       this.#locations.uniform.time,
       timestamp
+    );
+    gl.uniform2f(
+      this.#locations.uniform.mouse,
+      this.#mouse.x,
+      this.#mouse.y
     );
     gl.uniform1f(
       this.#locations.uniform.user.a,
