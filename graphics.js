@@ -31,6 +31,14 @@ class Graphics3D {
     uniform: {
       resolution: null,
       time: null,
+      user: {
+        a: null,
+        b: null,
+        c: null,
+        d: null,
+        e: null,
+        f: null,
+      },
     },
   };
   #buffers = {
@@ -47,16 +55,15 @@ class Graphics3D {
     this.#gl = gl;
     
     this.#program = this.#createProgram(vertexSourceMain, fragmentSourceMain);
-    for (const name in this.#locations.attribute) {
-      this.#locations.attribute[name] = gl.getAttribLocation(this.#program, name);
-    }
     this.#userInputs = userInputs;
-    for (const name in userInputs) {
-      this.#locations.uniform[name] = null;
-    }
-    for (const name in this.#locations.uniform) {
-      this.#locations.uniform[name] = gl.getUniformLocation(this.#program, name);
-    }
+    this.#locations.attribute.position = gl.getAttribLocation(this.#program, 'position');
+    this.#locations.uniform.time = gl.getUniformLocation(this.#program, 'time');
+    this.#locations.uniform.resolution = gl.getUniformLocation(this.#program, 'resolution');
+    this.#locations.uniform.user.a = gl.getUniformLocation(this.#program, 'user.a');
+    this.#locations.uniform.user.b = gl.getUniformLocation(this.#program, 'user.b');
+    this.#locations.uniform.user.c = gl.getUniformLocation(this.#program, 'user.c');
+    this.#locations.uniform.user.d = gl.getUniformLocation(this.#program, 'user.d');
+    this.#locations.uniform.user.e = gl.getUniformLocation(this.#program, 'user.e');
     
     this.#buffers.vertex = this.#createBuffer(
       gl.ARRAY_BUFFER,
@@ -102,12 +109,26 @@ class Graphics3D {
       this.#locations.uniform.time,
       timestamp
     );
-    for (const name in this.#userInputs) {
-      gl.uniform1f(
-        this.#locations.uniform[name],
-        this.#userInputs[name]
-      );
-    }
+    gl.uniform1f(
+      this.#locations.uniform.user.a,
+      this.#userInputs.a
+    );
+    gl.uniform1f(
+      this.#locations.uniform.user.b,
+      this.#userInputs.b
+    );
+    gl.uniform1f(
+      this.#locations.uniform.user.c,
+      this.#userInputs.c
+    );
+    gl.uniform1f(
+      this.#locations.uniform.user.d,
+      this.#userInputs.d
+    );
+    gl.uniform1f(
+      this.#locations.uniform.user.e,
+      this.#userInputs.e
+    );
     
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.#buffers.index);
     gl.drawElements(

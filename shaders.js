@@ -30,8 +30,13 @@ uniform vec2 resolution;
 uniform float time;
 
 // User inputs.
-uniform float spread;
-uniform float speed;
+uniform struct {
+  float a;
+  float b;
+  float c;
+  float d;
+  float e;
+} user;
 
 void setColor(out vec4 fragColor, in vec4 fragCoord) {
   vec2 p = fragCoord.xy - resolution*0.5;
@@ -54,6 +59,8 @@ void setColor(out vec4 fragColor, in vec4 fragCoord) {
   // Hyperbolas C.
   // float value = p.x*p.x/p.y - p.x;  
 
+  float spread = user.a;
+  float speed = user.b;
   float hue = fract(value*spread + time*speed);
   vec3 rgb = hsv2rgb(vec3(hue, 1.0, 1.0));
   fragColor = vec4(rgb, 1.0);
