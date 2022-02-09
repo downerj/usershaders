@@ -2,8 +2,8 @@ class Application {
   #graphics;
   #timer = new IntervalTimer(this.#onTick.bind(this), 10);
   userInputs = {
-    uSpread: 0.005,
-    uSpeed: 0.00025,
+    spread: 0.005,
+    speed: 0.00025,
   };
   
   constructor(canvas) {

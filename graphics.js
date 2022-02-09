@@ -26,11 +26,11 @@ class Graphics3D {
   #program;
   #locations = {
     attribute: {
-      inPosition: null,
+      position: null,
     },
     uniform: {
-      uResolution: null,
-      uTime: null,
+      resolution: null,
+      time: null,
     },
   };
   #buffers = {
@@ -94,12 +94,12 @@ class Graphics3D {
     gl.bindBuffer(gl.ARRAY_BUFFER, null);
     
     gl.uniform2f(
-      this.#locations.uniform.uResolution,
+      this.#locations.uniform.resolution,
       gl.canvas.clientWidth,
       gl.canvas.clientHeight
     );
     gl.uniform1f(
-      this.#locations.uniform.uTime,
+      this.#locations.uniform.time,
       timestamp
     );
     for (const name in this.#userInputs) {

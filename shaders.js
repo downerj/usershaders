@@ -1,10 +1,10 @@
 const vertexSourceMain = `#version 100
 precision highp float;
 
-attribute vec2 inPosition;
+attribute vec2 position;
 
 void main(void) {
-  gl_Position = vec4(inPosition, 0.0, 1.0);
+  gl_Position = vec4(position, 0.0, 1.0);
 }
 `;
 
@@ -22,26 +22,26 @@ vec3 hsv2rgb(in vec3 hsv) {
   float s = hsv.y;
   float v = hsv.z;
   vec3 k = vec3(1.0, 2.0/3.0, 1.0/3.0);
-  vec3 p = clamp(abs(6.0 * fract(h - k) - 3.0) - 1.0, 0.0, 1.0);
+  vec3 p = clamp(abs(6.0*fract(h - k) - 3.0) - 1.0, 0.0, 1.0);
   return v * mix(k.xxx, p, s);
 }
 
-uniform vec2 uResolution;
-uniform float uTime;
+uniform vec2 resolution;
+uniform float time;
 
 // User inputs.
-uniform float uSpread;
-uniform float uSpeed;
+uniform float spread;
+uniform float speed;
 
 void setColor(out vec4 fragColor, in vec4 fragCoord) {
-  float w = uResolution.x;
-  float h = uResolution.y;
+  float w = resolution.x;
+  float h = resolution.y;
   float x = fragCoord.x;
   float y = fragCoord.y;
   float xp = x - w*0.5;
   float yp = y - h*0.5;
   float value = sqrt(xp*xp + yp*yp);
-  float hue = mod(value * uSpread + uTime * uSpeed, 360.0);
+  float hue = mod(value*spread + time*speed, 360.0);
   vec3 rgb = hsv2rgb(vec3(hue, 1.0, 1.0));
   fragColor = vec4(rgb, 1.0);
 }
