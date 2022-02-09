@@ -38,13 +38,13 @@ uniform struct {
 } user;
 
 void setColor(out vec4 fragColor, in vec4 fragCoord) {
-  vec2 p = fragCoord.xy - resolution*0.5;
+  vec2 p = fragCoord.xy - mouse;
 
   // Diagonal lines.
-  float value = p.y - p.x;
+  // float value = p.y - p.x;
 
   // Circle.
-  // float value = sqrt(p.x*p.x + p.y*p.y);
+  float value = sqrt(p.x*p.x + p.y*p.y);
 
   // Hyperbolas A.
   // float value = sqrt(abs(p.x*p.x - p.y*p.y));

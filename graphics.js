@@ -115,7 +115,7 @@ class Graphics3D {
     gl.uniform2f(
       this.#locations.uniform.mouse,
       this.#mouse.x,
-      this.#mouse.y
+      gl.canvas.clientHeight - this.#mouse.y
     );
     gl.uniform1f(
       this.#locations.uniform.user.a,
