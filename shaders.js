@@ -39,11 +39,17 @@ void setColor(out vec4 fragColor, in vec4 fragCoord) {
   // Circle.
   // float value = sqrt(p.x*p.x + p.y*p.y);
 
-  // Hyperbolas.
+  // Hyperbolas A.
   // float value = sqrt(abs(p.x*p.x - p.y*p.y));
 
   // Parabolas.
-  float value = p.x*p.x/p.y;
+  // float value = p.x*p.x/p.y;
+
+  // Hyperbolas B.
+  // float value = p.x*p.x/p.y - p.y;
+
+  // Hyperbolas C.
+  float value = p.x*p.x/p.y - p.x;
 
   float hue = mod(value*spread + time*speed, 360.0);
   vec3 rgb = hsv2rgb(vec3(hue, 1.0, 1.0));
