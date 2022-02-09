@@ -34,13 +34,10 @@ uniform float spread;
 uniform float speed;
 
 void setColor(out vec4 fragColor, in vec4 fragCoord) {
-  float w = resolution.x;
-  float h = resolution.y;
-  float x = fragCoord.x;
-  float y = fragCoord.y;
-  float xp = x - w*0.5;
-  float yp = y - h*0.5;
-  float value = sqrt(xp*xp + yp*yp);
+  vec2 p = fragCoord.xy - resolution*0.5;
+
+  float value = sqrt(p.x*p.x + p.y*p.y);
+  
   float hue = mod(value*spread + time*speed, 360.0);
   vec3 rgb = hsv2rgb(vec3(hue, 1.0, 1.0));
   fragColor = vec4(rgb, 1.0);
