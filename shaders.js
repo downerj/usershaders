@@ -54,7 +54,7 @@ void setColor(out vec4 fragColor, in vec4 fragCoord) {
   // Hyperbolas C.
   // float value = p.x*p.x/p.y - p.x;  
 
-  float hue = value*spread + time*speed;
+  float hue = fract(value*spread + time*speed);
   vec3 rgb = hsv2rgb(vec3(hue, 1.0, 1.0));
   fragColor = vec4(rgb, 1.0);
 }
