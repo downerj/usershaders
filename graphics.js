@@ -14,10 +14,7 @@ class ProgramData {
 
   constructor(gl, fragment) {
     this.#gl = gl;
-    const status = this.update(fragment);
-    if (!status) {
-      throw 'Error constructing program from fragment';
-    }
+    this.update(fragment);
   }
   
   update(fragment) {
@@ -25,7 +22,7 @@ class ProgramData {
     this.#fragment = fragment;
     this.#program = this.#createProgram(vertexSourceMain, makeFragmentSource(fragment));
     if (this.#program === null) {
-      return false;
+      throw 'Error construction program from fragment';
     }
 
     this.#positionLocation = gl.getAttribLocation(this.#program, 'position');
@@ -37,8 +34,6 @@ class ProgramData {
     this.#userCLocation = gl.getUniformLocation(this.#program, 'user.c');
     this.#userDLocation = gl.getUniformLocation(this.#program, 'user.d');
     this.#userELocation = gl.getUniformLocation(this.#program, 'user.e');
-
-    return true;
   }
 
   get fragment() {
@@ -169,13 +164,7 @@ class Graphics3D {
     
     for (const name in fragmentsMain) {
       const fragment = fragmentsMain[name];
-      try {
-        const programData = new ProgramData(gl, fragment);
-        this.#programDatas[name] = programData;
-      } catch (e) {
-        console.error(`Fragment "${name}": ${e}`);
-        continue;
-      }
+      this.updateFragment(name, fragment);
     }
     this.setProgram('Hyperbolas B');
     
@@ -189,6 +178,20 @@ class Graphics3D {
       Graphics3D.#surface.indices,
       gl.STATIC_DRAW
     );
+  }
+
+  updateFragment(name, fragment) {
+    try {
+      if (name in this.#programDatas) {
+        this.#programDatas[name].update(fragment);
+      } else {
+        this.#programDatas[name] = new ProgramData(this.#gl, fragment);
+      }
+      return true;
+    } catch (e) {
+      console.error(`Fragment "${name}": ${e}`);
+      return false;
+    }
   }
 
   setProgram(name) {
