@@ -12,6 +12,10 @@ class Application {
   
   constructor(canvas) {
     this.#graphics = new Graphics3D(canvas, this.mouse, this.userInputs);
+    if (!('selectedProgram' in window.localStorage)) {
+      window.localStorage.setItem('selectedProgram', 'Hyperbolas A');
+    }
+    this.#graphics.setProgram(localStorage.getItem('selectedProgram'));
   }
   
   run() {
@@ -32,7 +36,11 @@ class Application {
   }
 
   setProgram(name) {
-    return this.#graphics.setProgram(name);
+    const status = this.#graphics.setProgram(name);
+    if (status) {
+      window.localStorage.setItem('selectedProgram', name);
+    }
+    return status;
   }
   
   get availablePrograms() {

@@ -144,8 +144,8 @@ class Graphics3D {
   
   #gl;
   #programDatas = {};
-  #programName = null;
-  #programData = null;
+  #programName;
+  #programData;
   #buffers = {
     vertex: null,
     index: null,
@@ -166,7 +166,7 @@ class Graphics3D {
       const fragment = fragmentsMain[name];
       this.updateFragment(name, fragment);
     }
-    this.setProgram('Hyperbolas B');
+    this.setProgram(null);
     
     this.#buffers.vertex = this.#createBuffer(
       gl.ARRAY_BUFFER,
@@ -195,7 +195,11 @@ class Graphics3D {
   }
 
   setProgram(name) {
-    if (!(name in this.#programDatas)) {
+    if (name === null) {
+      this.#programName = null;
+      this.#programData = null;
+      return null;
+    } else if (!(name in this.#programDatas)) {
       return false;
     }
     this.#programName = name;
