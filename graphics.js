@@ -37,7 +37,6 @@ class Graphics3D {
         c: null,
         d: null,
         e: null,
-        f: null,
       },
     },
   };
