@@ -1,151 +1,90 @@
-class Graphics3D {
-  static #getGL(canvas) {
-    for (const name of ['webgl', 'webgl-experimental']) {
-      const gl = canvas.getContext(name);
-      if (gl) {
-        return gl;
-      }
-    }
-    return null;
-  }
-  
-  static #surface = {
-    vertices: new Float32Array([
-      -1, -1,
-      -1, 1,
-      1, 1,
-      1, -1,
-    ]),
-    indices: new Uint16Array([
-      0, 1, 2,
-      0, 2, 3,
-    ]),
-  };
-  
+class ProgramData {
   #gl;
+  #fragment;
   #program;
-  #locations = {
-    attribute: {
-      position: null,
-    },
-    uniform: {
-      resolution: null,
-      time: null,
-      user: {
-        a: null,
-        b: null,
-        c: null,
-        d: null,
-        e: null,
-      },
-    },
-  };
-  #buffers = {
-    vertex: null,
-    index: null,
-  };
-  #userInputs;
-  #mouse;
-  
-  constructor(canvas, mouse, userInputs) {
-    const gl = Graphics3D.#getGL(canvas);
-    if (!gl) {
-      throw 'Unable to get WebGL context';
-    }
+  #positionLocation = null;
+  #resolutionLocation = null;
+  #timeLocation = null;
+  #mouseLocation = null;
+  #userALocation = null;
+  #userBLocation = null;
+  #userCLocation = null;
+  #userDLocation = null;
+  #userELocation = null;
+
+  constructor(gl, fragment) {
     this.#gl = gl;
-    this.#mouse = mouse;
-    
-    this.#program = this.#createProgram(vertexSourceMain, fragmentSourceMain);
-    this.#userInputs = userInputs;
-    this.#locations.attribute.position = gl.getAttribLocation(this.#program, 'position');
-    this.#locations.uniform.resolution = gl.getUniformLocation(this.#program, 'resolution');
-    this.#locations.uniform.time = gl.getUniformLocation(this.#program, 'time');
-    this.#locations.uniform.mouse = gl.getUniformLocation(this.#program, 'mouse');
-    this.#locations.uniform.user.a = gl.getUniformLocation(this.#program, 'user.a');
-    this.#locations.uniform.user.b = gl.getUniformLocation(this.#program, 'user.b');
-    this.#locations.uniform.user.c = gl.getUniformLocation(this.#program, 'user.c');
-    this.#locations.uniform.user.d = gl.getUniformLocation(this.#program, 'user.d');
-    this.#locations.uniform.user.e = gl.getUniformLocation(this.#program, 'user.e');
-    
-    this.#buffers.vertex = this.#createBuffer(
-      gl.ARRAY_BUFFER,
-      Graphics3D.#surface.vertices,
-      gl.STATIC_DRAW
-    );
-    this.#buffers.index = this.#createBuffer(
-      gl.ELEMENT_ARRAY_BUFFER,
-      Graphics3D.#surface.indices,
-      gl.STATIC_DRAW
-    );
+    const status = this.update(fragment);
+    if (!status) {
+      throw 'Error constructing program from fragment';
+    }
   }
   
-  render(timestamp) {
+  update(fragment) {
     const gl = this.#gl;
-    
-    gl.clearColor(0.0, 0.0, 0.0, 1.0);
-    gl.clearDepth(1.0);
-    gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.viewport(0, 0, gl.canvas.clientWidth, gl.canvas.clientHeight);
-    
-    gl.useProgram(this.#program);
-    
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.#buffers.vertex);
-    gl.vertexAttribPointer(
-      this.#locations.attribute.inPosition,
-      2,
-      gl.FLOAT,
-      false,
-      0,
-      0
-    );
-    gl.enableVertexAttribArray(this.#locations.attribute.inPosition);
-    
-    gl.bindBuffer(gl.ARRAY_BUFFER, null);
-    
-    gl.uniform2f(
-      this.#locations.uniform.resolution,
-      gl.canvas.clientWidth,
-      gl.canvas.clientHeight
-    );
-    gl.uniform1f(
-      this.#locations.uniform.time,
-      timestamp
-    );
-    gl.uniform2f(
-      this.#locations.uniform.mouse,
-      this.#mouse.x,
-      gl.canvas.clientHeight - this.#mouse.y
-    );
-    gl.uniform1f(
-      this.#locations.uniform.user.a,
-      this.#userInputs.a
-    );
-    gl.uniform1f(
-      this.#locations.uniform.user.b,
-      this.#userInputs.b
-    );
-    gl.uniform1f(
-      this.#locations.uniform.user.c,
-      this.#userInputs.c
-    );
-    gl.uniform1f(
-      this.#locations.uniform.user.d,
-      this.#userInputs.d
-    );
-    gl.uniform1f(
-      this.#locations.uniform.user.e,
-      this.#userInputs.e
-    );
-    
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.#buffers.index);
-    gl.drawElements(
-      gl.TRIANGLES,
-      Graphics3D.#surface.indices.length,
-      gl.UNSIGNED_SHORT,
-      0
-    );
+    this.#fragment = fragment;
+    this.#program = this.#createProgram(vertexSourceMain, makeFragmentSource(fragment));
+    if (this.#program === null) {
+      return false;
+    }
+
+    this.#positionLocation = gl.getAttribLocation(this.#program, 'position');
+    this.#resolutionLocation = gl.getUniformLocation(this.#program, 'resolution');
+    this.#timeLocation = gl.getUniformLocation(this.#program, 'time');
+    this.#mouseLocation = gl.getUniformLocation(this.#program, 'mouse');
+    this.#userALocation = gl.getUniformLocation(this.#program, 'user.a');
+    this.#userBLocation = gl.getUniformLocation(this.#program, 'user.b');
+    this.#userCLocation = gl.getUniformLocation(this.#program, 'user.c');
+    this.#userDLocation = gl.getUniformLocation(this.#program, 'user.d');
+    this.#userELocation = gl.getUniformLocation(this.#program, 'user.e');
+
+    return true;
   }
-  
+
+  get fragment() {
+    return this.#fragment;
+  }
+
+  get program() {
+    return this.#program;
+  }
+
+  get positionLocation() {
+    return this.#positionLocation;
+  }
+
+  get resolutionLocation() {
+    return this.#resolutionLocation;
+  }
+
+  get timeLocation() {
+    return this.#timeLocation;
+  }
+
+  get mouseLocation() {
+    return this.#mouseLocation;
+  }
+
+  get userALocation() {
+    return this.#userALocation;
+  }
+
+  get userBLocation() {
+    return this.#userBLocation;
+  }
+
+  get userCLocation() {
+    return this.#userCLocation;
+  }
+
+  get userDLocation() {
+    return this.#userDLocation;
+  }
+
+  get userELocation() {
+    return this.#userELocation;
+  }
+
   #createShader(type, source) {
     const gl = this.#gl;
     const shader = gl.createShader(type);
@@ -182,7 +121,149 @@ class Graphics3D {
     gl.deleteShader(fragmentShader);
     return status ? program : null;
   }
+}
+
+class Graphics3D {
+  static #getGL(canvas) {
+    for (const name of ['webgl', 'webgl-experimental']) {
+      const gl = canvas.getContext(name);
+      if (gl) {
+        return gl;
+      }
+    }
+    return null;
+  }
   
+  static #surface = {
+    vertices: new Float32Array([
+      -1, -1,
+      -1, 1,
+      1, 1,
+      1, -1,
+    ]),
+    indices: new Uint16Array([
+      0, 1, 2,
+      0, 2, 3,
+    ]),
+  };
+  
+  #gl;
+  #programDatas = {};
+  #programName = null;
+  #programData = null;
+  #buffers = {
+    vertex: null,
+    index: null,
+  };
+  #userInputs;
+  #mouse;
+  
+  constructor(canvas, mouse, userInputs) {
+    const gl = Graphics3D.#getGL(canvas);
+    if (!gl) {
+      throw 'Unable to get WebGL context';
+    }
+    this.#gl = gl;
+    this.#mouse = mouse;
+    this.#userInputs = userInputs;
+    
+    for (const name in fragmentsMain) {
+      const fragment = fragmentsMain[name];
+      try {
+        const programData = new ProgramData(gl, fragment);
+        this.#programDatas[name] = programData;
+      } catch (e) {
+        console.error(`Fragment "${name}": ${e}`);
+        continue;
+      }
+    }
+    if ('Hyperbolas B' in this.#programDatas) {
+      this.#programName = 'Hyperbolas B';
+      this.#programData = this.#programDatas['Hyperbolas B'];
+    }
+    
+    this.#buffers.vertex = this.#createBuffer(
+      gl.ARRAY_BUFFER,
+      Graphics3D.#surface.vertices,
+      gl.STATIC_DRAW
+    );
+    this.#buffers.index = this.#createBuffer(
+      gl.ELEMENT_ARRAY_BUFFER,
+      Graphics3D.#surface.indices,
+      gl.STATIC_DRAW
+    );
+  }
+  
+  render(timestamp) {
+    const gl = this.#gl;
+    
+    gl.clearColor(0.0, 0.0, 0.0, 1.0);
+    gl.clearDepth(1.0);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.viewport(0, 0, gl.canvas.clientWidth, gl.canvas.clientHeight);
+    
+    if (this.#programData === null) {
+      return;
+    }
+    gl.useProgram(this.#programData.program);
+    
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.#buffers.vertex);
+    gl.vertexAttribPointer(
+      this.#programData.positionLocation,
+      2,
+      gl.FLOAT,
+      false,
+      0,
+      0
+    );
+    gl.enableVertexAttribArray(this.#programData.positionLocation);
+    
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+    
+    gl.uniform2f(
+      this.#programData.resolutionLocation,
+      gl.canvas.clientWidth,
+      gl.canvas.clientHeight
+    );
+    gl.uniform1f(
+      this.#programData.timeLocation,
+      timestamp
+    );
+    gl.uniform2f(
+      this.#programData.mouseLocation,
+      this.#mouse.x,
+      gl.canvas.clientHeight - this.#mouse.y
+    );
+    gl.uniform1f(
+      this.#programData.userALocation,
+      this.#userInputs.a
+    );
+    gl.uniform1f(
+      this.#programData.userBLocation,
+      this.#userInputs.b
+    );
+    gl.uniform1f(
+      this.#programData.userCLocation,
+      this.#userInputs.c
+    );
+    gl.uniform1f(
+      this.#programData.userDLocation,
+      this.#userInputs.d
+    );
+    gl.uniform1f(
+      this.#programData.userELocation,
+      this.#userInputs.e
+    );
+    
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.#buffers.index);
+    gl.drawElements(
+      gl.TRIANGLES,
+      Graphics3D.#surface.indices.length,
+      gl.UNSIGNED_SHORT,
+      0
+    );
+  }
+     
   #createBuffer(target, data, usage) {
     const gl = this.#gl;
     const buffer = gl.createBuffer(target);

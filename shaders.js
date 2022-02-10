@@ -8,7 +8,7 @@ void main(void) {
 }
 `;
 
-const fragmentSourceMain = `#version 100
+const fragmentSourceMainA = `#version 100
 #ifdef GL_FRAGMENT_PRECISION_HIGH
 precision highp float;
 #else
@@ -35,37 +35,37 @@ uniform struct {
   float c;
   float d;
   float e;
-} user;
+} user;`;
 
+function makeRainbowFragment(valueSegment) {
+  return `
 void setColor(out vec4 fragColor, in vec4 fragCoord) {
   vec2 p = fragCoord.xy - resolution*0.5;
-
-  // Diagonal lines.
-  // float value = p.y - p.x;
-
-  // Circle.
-  float value = sqrt(p.x*p.x + p.y*p.y);
-
-  // Hyperbolas A.
-  // float value = sqrt(abs(p.x*p.x - p.y*p.y));
-
-  // Parabolas.
-  // float value = p.x*p.x/p.y;
-
-  // Hyperbolas B.
-  // float value = p.x*p.x/p.y - p.y;
-
-  // Hyperbolas C.
-  // float value = p.x*p.x/p.y - p.x;  
+  
+  ${valueSegment}
 
   float spread = user.a;
   float speed = user.b;
   float hue = fract(value*spread + time*speed);
   vec3 rgb = hsv2rgb(vec3(hue, 1.0, 1.0));
   fragColor = vec4(rgb, 1.0);
+}`;
 }
 
+const fragmentsMain = {
+  'Circle': makeRainbowFragment('float value = sqrt(p.x*p.x + p.y*p.y);'),
+  'Diagonal Lines': makeRainbowFragment('float value = p.y - p.x;'),
+  'Hyperbolas A': makeRainbowFragment('float value = sqrt(abs(p.x*p.x - p.y*p.y));'),
+  'Hyperbolas B': makeRainbowFragment('float value = p.x*p.x/p.y - p.y;'),
+  'Parabolas': makeRainbowFragment('float value = p.x*p.x/p.y;'),
+};
+
+const fragmentSourceMainB = `
 void main(void) {
   setColor(gl_FragColor, gl_FragCoord);
+}`;
+
+function makeFragmentSource(fragment) {
+  return fragmentSourceMainA + fragment + fragmentSourceMainB;
 }
-`;
+
