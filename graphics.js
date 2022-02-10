@@ -12,9 +12,9 @@ class Graphics3D {
   static #surface = {
     vertices: new Float32Array([
       -1, -1,
-      1, -1,
-      1, 1,
       -1, 1,
+      1, 1,
+      1, -1,
     ]),
     indices: new Uint16Array([
       0, 1, 2,
