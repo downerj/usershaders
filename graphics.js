@@ -200,6 +200,11 @@ class Graphics3D {
     }
     this.#programName = name;
     this.#programData = this.#programDatas[name];
+    return true;
+  }
+  
+  get availablePrograms() {
+    return Object.keys(this.#programDatas);
   }
   
   render(timestamp) {

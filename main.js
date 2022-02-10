@@ -26,7 +26,19 @@ class Application {
     this.mouse.x = x;
     this.mouse.y = y;
   }
+
+  updateFragment(name, fragment) {
+    return this.#graphics.updateFragment(name, fragment);
+  }
+
+  setProgram(name) {
+    return this.#graphics.setProgram(name);
+  }
   
+  get availablePrograms() {
+    return this.#graphics.availablePrograms;
+  }
+
   #onTick(timestamp) {
     this.#graphics.render(timestamp);
     return true;
