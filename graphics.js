@@ -177,10 +177,7 @@ class Graphics3D {
         continue;
       }
     }
-    if ('Hyperbolas B' in this.#programDatas) {
-      this.#programName = 'Hyperbolas B';
-      this.#programData = this.#programDatas['Hyperbolas B'];
-    }
+    this.setProgram('Hyperbolas B');
     
     this.#buffers.vertex = this.#createBuffer(
       gl.ARRAY_BUFFER,
@@ -192,6 +189,14 @@ class Graphics3D {
       Graphics3D.#surface.indices,
       gl.STATIC_DRAW
     );
+  }
+
+  setProgram(name) {
+    if (!(name in this.#programDatas)) {
+      return false;
+    }
+    this.#programName = name;
+    this.#programData = this.#programDatas[name];
   }
   
   render(timestamp) {
