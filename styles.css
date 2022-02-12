@@ -66,6 +66,8 @@ div.button {
   background-color: white;
   cursor: pointer;
   margin: var(--button-margin);
+  border: 1px solid black;
+  border-radius: 5px;
 }
 
 div.invisible {
@@ -95,6 +97,7 @@ textarea {
   font: 14pt monospace;
   resize: none;
   border: 1px solid white;
+  border-radius: 5px;
 }
 
 div.drawing-area {
