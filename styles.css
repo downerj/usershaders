@@ -6,6 +6,7 @@
   --side-pane-width: 50%;
   --button-width: 30px;
   --button-margin: 5px;
+  --input-font-size: 12pt;
 }
 
 @media (max-width: 1300px) {
@@ -93,6 +94,15 @@ div.input-area {
 
 div.program-select-bar {
   height: 30px;
+  width: 100%;
+}
+
+select {
+  width: 100%;
+  font-size: var(--input-font-size);
+  background-color: black;
+  color: aqua;
+  border: 1px solid aqua;
 }
 
 textarea {
@@ -100,13 +110,13 @@ textarea {
   height: 100%;
   background-color: black;
   color: yellow;
-  font: 12pt monospace;
+  font: var(--input-font-size) monospace;
   resize: none;
-  border: 1px solid white;
+  border: 1px solid yellow;
   border-radius: 3px;
   white-space: pre;
   overflow-wrap: normal;
-  overflow-x: scroll; 
+  overflow-x: scroll;
 }
 
 div.drawing-area {
