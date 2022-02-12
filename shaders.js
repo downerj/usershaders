@@ -49,7 +49,7 @@ void setColor(out vec4 fragColor, in vec4 fragCoord) {
   float hue = fract(value*spread + time*speed);
   vec3 rgb = hsv2rgb(vec3(hue, 1.0, 1.0));
   fragColor = vec4(rgb, 1.0);
-}`;
+}`.trim();
 }
 
 const fragmentsMain = {
@@ -63,7 +63,7 @@ const fragmentsMain = {
 const fragmentSourceMainB = `
 void main(void) {
   setColor(gl_FragColor, gl_FragCoord);
-}`;
+}`.trim();
 
 function makeFragmentSource(fragment) {
   return fragmentSourceMainA + fragment + fragmentSourceMainB;

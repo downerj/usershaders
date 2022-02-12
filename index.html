@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <meta name="theme-color" content="#000000"/>
     <title>Fragment Shaders</title>
-    <!-- <link rel="shortcut icon" href="favicon.png"/> -->
+    <link rel="shortcut icon" href="favicon.png"/>
     <link rel="stylesheet" href="styles.css"/>
     <script src="shaders.js"></script>
     <script src="graphics.js"></script>
@@ -13,6 +13,26 @@
     <script src="main.js"></script>
   </head>
   <body>
+    <input type="checkbox" class="menu-toggle" id="menu-toggle" hidden/>
+    <div class="side-pane">
+      <div class="button-strip">
+        <div class="button invisible"></div>
+        <div class="button run-button" title="Run program">
+        </div>
+        <div class="button save-button" title="Save program">
+        </div>
+      </div>
+      <div class="input-area">
+        <div class="program-select-bar">
+          <select id="fragment-dropdown"></select>
+        </div>
+        <textarea id="fragment-input" spellcheck="false" disabled></textarea>
+      </div>
+    </div>
+    <label for="menu-toggle">
+      <div class="button menu-button" title="Open menu">
+      </div>
+    </label>
     <div class="drawing-area">
       <canvas id="cvs">
         Your browser does not support the HTML5 Canvas API.

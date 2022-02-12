@@ -2,6 +2,25 @@
   box-sizing: border-box;
 }
 
+:root {
+  --side-pane-width: 50%;
+  --button-width: 30px;
+  --button-margin: 5px;
+  --input-font-size: 12pt;
+}
+
+@media (max-width: 1300px) {
+  :root {
+    --side-pane-width: 75%;
+  }
+}
+
+@media (max-width: 700px) {
+  :root {
+    --side-pane-width: 100%;
+  }
+}
+
 html {
   height: calc(100% - 10px);
 }
@@ -14,7 +33,97 @@ body {
   font-family: Tahoma, Verdana, sans-serif;
 }
 
-.drawing-area {
+input.menu-toggle {
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+input.menu-toggle:not(:checked) + div.side-pane {
+  left: calc(0px - var(--side-pane-width));
+}
+
+div.side-pane {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--side-pane-width);
+  height: 100%;
+  background-color: black;
+  transition: left;
+  transition-duration: 0.5s;
+  overflow: hidden;
+}
+
+div.button-strip {
+  display: inline-block;
+  width: var(--button-width);
+  height: 100%;
+}
+
+div.button {
+  width: var(--button-width);
+  height: var(--button-width);
+  background-color: white;
+  cursor: pointer;
+  margin: var(--button-margin);
+  border: 1px solid black;
+  border-radius: 5px;
+}
+
+div.invisible {
+  visibility: hidden;
+}
+
+div.menu-button {
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+div.input-area {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  left: calc(var(--button-margin)*2 + var(--button-width));
+  top: 0;
+  padding: var(--button-margin);
+  width: calc(100% - var(--button-width) - var(--button-margin)*2);
+  height: 100%;
+}
+
+div.program-select-bar {
+  height: 30px;
+  width: 100%;
+}
+
+select {
+  width: 100%;
+  font-size: var(--input-font-size);
+  background-color: black;
+  color: aqua;
+  border: 1px solid aqua;
+  border-radius: 3px;
+}
+
+textarea {
+  width: 100%;
+  height: 100%;
+  background-color: black;
+  color: yellow;
+  font: var(--input-font-size) monospace;
+  resize: none;
+  border: 1px solid yellow;
+  border-radius: 3px;
+  white-space: pre;
+  overflow-wrap: normal;
+  overflow-x: scroll;
+  padding: 5px;
+}
+
+div.drawing-area {
   width: 100%;
   height: 100%;
 }
+
+

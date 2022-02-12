@@ -166,7 +166,7 @@ class Graphics3D {
       const fragment = fragmentsMain[name];
       this.updateFragment(name, fragment);
     }
-    this.setProgram(null);
+    this.setFragment(null);
     
     this.#buffers.vertex = this.#createBuffer(
       gl.ARRAY_BUFFER,
@@ -194,7 +194,7 @@ class Graphics3D {
     }
   }
 
-  setProgram(name) {
+  setFragment(name) {
     if (name === null) {
       this.#programName = null;
       this.#programData = null;
@@ -207,8 +207,16 @@ class Graphics3D {
     return true;
   }
   
-  get availablePrograms() {
+  get availableFragments() {
     return Object.keys(this.#programDatas);
+  }
+
+  getFragmentFor(name) {
+    return this.#programDatas[name]?.fragment ?? null;
+  }
+
+  get currentFragment() {
+    return this.#programName;
   }
   
   render(timestamp) {
