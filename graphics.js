@@ -207,8 +207,12 @@ class Graphics3D {
     return true;
   }
   
-  get availablePrograms() {
+  get availableFragments() {
     return Object.keys(this.#programDatas);
+  }
+
+  getFragmentFor(name) {
+    return this.#programDatas[name]?.fragment ?? null;
   }
   
   render(timestamp) {

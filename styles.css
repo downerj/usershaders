@@ -8,7 +8,7 @@
   --button-margin: 5px;
 }
 
-@media (max-width: 1000px) {
+@media (max-width: 1300px) {
   :root {
     --side-pane-width: 75%;
   }
@@ -95,19 +95,18 @@ div.program-select-bar {
   height: 30px;
 }
 
-div.program-select-bar select {
-  width: 100%;
-}
-
 textarea {
   width: 100%;
   height: 100%;
   background-color: black;
-  color: white;
-  font: 14pt monospace;
+  color: yellow;
+  font: 12pt monospace;
   resize: none;
   border: 1px solid white;
   border-radius: 3px;
+  white-space: pre;
+  overflow-wrap: normal;
+  overflow-x: scroll; 
 }
 
 div.drawing-area {

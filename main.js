@@ -43,8 +43,12 @@ class Application {
     return status;
   }
   
-  get availablePrograms() {
-    return this.#graphics.availablePrograms;
+  get availableFragments() {
+    return this.#graphics.availableFragments;
+  }
+
+  getFragmentFor(name) {
+    return this.#graphics.getFragmentFor(name);
   }
 
   #onTick(timestamp) {
@@ -64,12 +68,22 @@ window.addEventListener('load', () => {
   window.addEventListener('resize', window_onResize);
   window_onResize();
 
+  app = new Application(cvs);
   function cvs_onMouseMove(event) {
     app.mouseMove(event.clientX, event.clientY);
   }
   cvs.addEventListener('mousemove', cvs_onMouseMove);
-  
-  app = new Application(cvs);
+
+  const fragmentDropdown = document.getElementById('fragment-dropdown');
+  const fragmentInput = document.getElementById('fragment-input');
+
+  for (const fragment of app.availableFragments) {
+    const option = document.createElement('OPTION');
+    option.textContent = fragment;
+    fragmentDropdown.appendChild(option);
+  }
+  fragmentInput.value = app.getFragmentFor('Circle');
+
   app.run();
 });
 
