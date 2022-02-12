@@ -60,6 +60,24 @@ div.button-strip {
   height: 100%;
 }
 
+div.button {
+  width: var(--button-width);
+  height: var(--button-width);
+  background-color: white;
+  cursor: pointer;
+  margin: var(--button-margin);
+}
+
+div.invisible {
+  visibility: hidden;
+}
+
+div.menu-button {
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
 div.input-area {
   display: inline-block;
   position: absolute;
@@ -77,16 +95,6 @@ textarea {
   font: 14pt monospace;
   resize: none;
   border: 1px solid white;
-}
-
-div.menu-button {
-  position: fixed;
-  top: var(--button-margin);
-  left: var(--button-margin);
-  width: var(--button-width);
-  height: var(--button-width);
-  background-color: white;
-  cursor: pointer;
 }
 
 div.drawing-area {
