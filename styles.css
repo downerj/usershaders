@@ -4,6 +4,8 @@
 
 :root {
   --side-pane-width: 50%;
+  --button-width: 30px;
+  --button-margin: 5px;
 }
 
 @media (max-width: 1000px) {
@@ -30,14 +32,14 @@ body {
   font-family: Tahoma, Verdana, sans-serif;
 }
 
-div.menu-button {
+input.pane-check {
   position: fixed;
   top: 0;
   left: 0;
-  width: 30px;
-  height: 30px;
-  background-color: white;
-  cursor: pointer;
+}
+
+input.pane-check:checked + div.sidepane {
+  left: calc(0px - var(--side-pane-width));
 }
 
 div.sidepane {
@@ -49,21 +51,47 @@ div.sidepane {
   background-color: black;
   transition: left;
   transition-duration: 0.5s;
+  overflow: hidden;
+}
+
+div.button-strip {
+  display: inline-block;
+  width: var(--button-width);
+  height: 100%;
+}
+
+div.input-area {
+  display: inline-block;
+  position: absolute;
+  left: calc(var(--button-margin)*2 + var(--button-width));
+  top: var(--button-margin);
+  width: calc(100% - var(--button-width) - var(--button-margin)*3);
+  height: calc(100% - var(--button-margin)*2);
+}
+
+textarea {
+  width: 100%;
+  height: 100%;
+  background-color: black;
+  color: white;
+  font: 14pt monospace;
+  resize: none;
+  border: 1px solid white;
+}
+
+div.menu-button {
+  position: fixed;
+  top: var(--button-margin);
+  left: var(--button-margin);
+  width: var(--button-width);
+  height: var(--button-width);
+  background-color: white;
+  cursor: pointer;
 }
 
 div.drawing-area {
   width: 100%;
   height: 100%;
-}
-
-input.pane-check {
-  position: fixed;
-  top: 0;
-  left: 0;
-}
-
-input.pane-check:checked + div.sidepane {
-  left: calc(0px - var(--side-pane-width));
 }
 
 
