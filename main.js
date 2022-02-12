@@ -115,6 +115,11 @@ window.addEventListener('load', () => {
     app.mouseMove(event.clientX, event.clientY);
   });
 
+  const menuToggle = document.getElementById('menu-toggle');
+  cvs.addEventListener('click', () => {
+    menuToggle.checked = false;
+  });
+
   const fragmentDropdown = document.getElementById('fragment-dropdown');
   const fragmentInput = document.getElementById('fragment-input');
 

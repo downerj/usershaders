@@ -32,17 +32,17 @@ body {
   font-family: Tahoma, Verdana, sans-serif;
 }
 
-input.pane-check {
+input.menu-toggle {
   position: fixed;
   top: 0;
   left: 0;
 }
 
-input.pane-check:checked + div.sidepane {
+input.menu-toggle:not(:checked) + div.side-pane {
   left: calc(0px - var(--side-pane-width));
 }
 
-div.sidepane {
+div.side-pane {
   position: fixed;
   top: 0;
   left: 0;
