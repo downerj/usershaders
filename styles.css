@@ -81,12 +81,22 @@ div.menu-button {
 }
 
 div.input-area {
-  display: inline-block;
+  display: flex;
+  flex-direction: column;
   position: absolute;
   left: calc(var(--button-margin)*2 + var(--button-width));
-  top: var(--button-margin);
-  width: calc(100% - var(--button-width) - var(--button-margin)*3);
-  height: calc(100% - var(--button-margin)*2);
+  top: 0;
+  padding: var(--button-margin);
+  width: calc(100% - var(--button-width) - var(--button-margin)*2);
+  height: 100%;
+}
+
+div.program-select-bar {
+  height: 30px;
+}
+
+div.program-select-bar select {
+  width: 100%;
 }
 
 textarea {
@@ -97,7 +107,7 @@ textarea {
   font: 14pt monospace;
   resize: none;
   border: 1px solid white;
-  border-radius: 5px;
+  border-radius: 3px;
 }
 
 div.drawing-area {
