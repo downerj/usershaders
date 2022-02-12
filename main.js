@@ -1,3 +1,41 @@
+const storage = new class {
+  getLocalItem(key) {
+    try {
+      return window.localStorage.getItem(key);
+    } catch (_e) {
+      return null;
+    }
+  }
+
+  setLocalItem(key, value) {
+    try {
+      window.localStorage.setItem(key, value);
+
+      return true;
+    } catch (_e) {
+      return false;
+    }
+  }
+
+  removeLocalItem(key) {
+    try {
+      window.localStorage.removeItem(key);
+
+      return true;
+    } catch (_e) {
+      return false;
+    }
+  }
+
+  get keys() {
+    try {
+      return Object.keys(window.localStorage);
+    } catch (_e) {
+      return [];
+    }
+  }
+}();
+
 class Application {
   #graphics;
   #timer = new IntervalTimer(this.#onTick.bind(this), 10);
@@ -12,10 +50,11 @@ class Application {
   
   constructor(canvas) {
     this.#graphics = new Graphics3D(canvas, this.mouse, this.userInputs);
-    if (!('selectedProgram' in window.localStorage)) {
-      window.localStorage.setItem('selectedProgram', 'Hyperbolas A');
+    let selectedFragment = storage.getLocalItem('selectedProgram');
+    if (!selectedFragment) {
+      storage.setLocalItem('selectdProgram', 'Hyperbolas A');
     }
-    this.#graphics.setProgram(localStorage.getItem('selectedProgram'));
+    this.#graphics.setFragment(selectedFragment);
   }
   
   run() {
@@ -35,8 +74,8 @@ class Application {
     return this.#graphics.updateFragment(name, fragment);
   }
 
-  setProgram(name) {
-    const status = this.#graphics.setProgram(name);
+  setFragment(name) {
+    const status = this.#graphics.setFragment(name);
     if (status) {
       window.localStorage.setItem('selectedProgram', name);
     }
@@ -51,13 +90,16 @@ class Application {
     return this.#graphics.getFragmentFor(name);
   }
 
+  get currentFragment() {
+    return this.#graphics.currentFragment;
+  }
+
   #onTick(timestamp) {
     this.#graphics.render(timestamp);
     return true;
   }
 }
 
-let app;
 window.addEventListener('load', () => {
   const cvs = document.getElementById('cvs');
   
@@ -69,10 +111,9 @@ window.addEventListener('load', () => {
   window_onResize();
 
   app = new Application(cvs);
-  function cvs_onMouseMove(event) {
+  cvs.addEventListener('mousemove', () => {
     app.mouseMove(event.clientX, event.clientY);
-  }
-  cvs.addEventListener('mousemove', cvs_onMouseMove);
+  });
 
   const fragmentDropdown = document.getElementById('fragment-dropdown');
   const fragmentInput = document.getElementById('fragment-input');
@@ -80,9 +121,25 @@ window.addEventListener('load', () => {
   for (const fragment of app.availableFragments) {
     const option = document.createElement('OPTION');
     option.textContent = fragment;
+    option.value = fragment;
     fragmentDropdown.appendChild(option);
   }
-  fragmentInput.value = app.getFragmentFor('Circle');
+  const currentFragment = app.currentFragment;
+  const index = (() => {
+    for (const [index, option] of [...fragmentDropdown.options].entries()) {
+      if (option.value === currentFragment) {
+        return index;
+      }
+    }
+  })();
+  fragmentDropdown.selectedIndex = index;
+  fragmentInput.value = app.getFragmentFor(currentFragment);
+
+  fragmentDropdown.addEventListener('input', () => {
+    const selectedFragment = fragmentDropdown.selectedOptions[0].value;
+    app.setFragment(selectedFragment);
+    fragmentInput.value = app.getFragmentFor(selectedFragment);
+  });
 
   app.run();
 });
