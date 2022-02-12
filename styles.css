@@ -103,6 +103,7 @@ select {
   background-color: black;
   color: aqua;
   border: 1px solid aqua;
+  border-radius: 3px;
 }
 
 textarea {
@@ -117,6 +118,7 @@ textarea {
   white-space: pre;
   overflow-wrap: normal;
   overflow-x: scroll;
+  padding: 5px;
 }
 
 div.drawing-area {
