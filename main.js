@@ -52,7 +52,9 @@ class Application {
     this.#graphics = new Graphics3D(canvas, this.mouse, this.userInputs);
     let selectedFragment = storage.getLocalItem('selectedProgram');
     if (!selectedFragment) {
-      storage.setLocalItem('selectdProgram', 'Hyperbolas A');
+      const defaultProgram = 'Hyperbolas A';
+      storage.setLocalItem('selectdProgram', defaultProgram);
+      selectedFragment = defaultProgram;
     }
     this.#graphics.setFragment(selectedFragment);
   }
