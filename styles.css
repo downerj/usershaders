@@ -69,10 +69,10 @@ div.button-strip {
 div.button {
   width: var(--button-width);
   height: var(--button-width);
-  background-color: white;
+  background-color: black;
   cursor: pointer;
   margin: var(--button-margin);
-  border: 1px solid black;
+  border: 1px solid white;
   border-radius: 5px;
 }
 
