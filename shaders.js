@@ -16,6 +16,11 @@ precision mediump float;
 #endif
 
 #define PI 3.141592653589793
+#define DEG_TO_RAD PI/180.0
+#define RAD_TO_DEG 180.0/PI
+
+const vec2 R = vec2(1.0, 0.0);
+const vec2 I = vec2(0.0, 1.0);
 
 vec3 hsv2rgb(in vec3 hsv) {
   float h = hsv.x;
@@ -24,6 +29,52 @@ vec3 hsv2rgb(in vec3 hsv) {
   vec3 k = vec3(1.0, 2.0/3.0, 1.0/3.0);
   vec3 p = clamp(abs(6.0*fract(h - k) - 3.0) - 1.0, 0.0, 1.0);
   return v * mix(k.xxx, p, s);
+}
+
+vec3 complexColor(vec2 point) {
+  float x = point.x;
+  float y = point.y;
+  float r = sqrt(x*x + y*y);
+  float a = atan(y, x)*RAD_TO_DEG;
+  
+  const float satRatio = 0.0625;
+  float hue = a / 360.0;
+  float sat = 1.0 - pow(satRatio, r);
+  const float val = 1.0;
+  
+  return hsv2rgb(vec3(hue, sat, val));
+}
+
+vec2 cMul(vec2 a, vec2 b) {
+  return vec2(a.x*b.x - a.y*b.y, a.x*b.y + a.y*b.x);
+}
+
+vec2 cDiv(vec2 a, vec2 b) {
+  float d = b.x*b.x + b.y*b.y;
+  return vec2((a.x*b.x + a.y*b.y)/d, (a.y*b.x - a.x*b.y)/d);
+}
+
+float cLen(vec2 z) {
+  return sqrt(z.x*z.x + z.y*z.y);
+}
+
+float cArg(vec2 z) {
+  return atan(z.y, z.x);
+}
+
+vec2 cPolar(float r, float th) {
+  return vec2(r*cos(th), r*sin(th));
+}
+
+vec2 cUnit(vec2 z) {
+  float d = sqrt(z.x*z.x + z.y*z.y);
+  return vec2(z.x/d, z.y/d);
+}
+
+vec2 cRotate(vec2 z, float degrees) {
+  float r = cLen(z);
+  float th = cArg(z);
+  return cPolar(r, th + degrees*DEG_TO_RAD);
 }
 
 uniform vec2 resolution;
@@ -65,6 +116,26 @@ void setColor(out vec4 fragColor, in vec4 fragCoord) {
 }
 `.trim();
 
+const complexFragmentA = `
+vec2 func(vec2 z) {
+  vec2 a = cMul(z, z) - R;
+  vec2 b = z - 2.0*R - I;
+  vec2 b2 = cMul(b, b);
+  vec2 d = cMul(z, z) + 2.0*R + 2.0*I;
+  vec2 o = cDiv(cMul(a, b2), d);
+  // float angle = mod(uTime / 20.0, 360.0);
+  return o;
+}
+
+void setColor(out vec4 fragColor, in vec4 fragCoord) {
+  vec2 c = resolution*0.5;
+  float scale = 0.1*min(resolution.x, resolution.y);
+  vec2 z = (fragCoord.xy - c)/scale;
+  vec2 o = func(z);
+  fragColor = vec4(complexColor(o), 1.0);
+}
+`.trim();
+
 function makeRainbowFragment(valueSegment) {
   return `
 void setColor(out vec4 fragColor, in vec4 fragCoord) {
@@ -84,6 +155,7 @@ void setColor(out vec4 fragColor, in vec4 fragCoord) {
 
 const fragmentsMain = {
   'Circle': makeRainbowFragment('float value = sqrt(p.x*p.x + p.y*p.y);'),
+  'Complex Graph A': complexFragmentA,
   'Diagonal Lines': makeRainbowFragment('float value = p.y - p.x;'),
   'Hyperbolas A': makeRainbowFragment('float value = sqrt(abs(p.x*p.x - p.y*p.y));'),
   'Hyperbolas B': makeRainbowFragment('float value = p.x*p.x/p.y - p.y;'),
