@@ -38,14 +38,14 @@ uniform struct {
 } user;`;
 
 const mandelbrotFragment = `
-int mandelbrot(in vec2 uv) {
-  vec2 p = vec2(0.0, 0.0);
+int mandelbrot(in vec2 p) {
+  vec2 t = vec2(0.0, 0.0);
   const int maxIterations = 1000;
   for (int i = 0; i < maxIterations - 1; i++) {
-    if (p.x*p.x + p.y*p.y > 4.0) {
+    if (t.x*t.x + t.y*t.y > 4.0) {
       return i;
     }
-    p = vec2(p.x*p.x - p.y*p.y, 2.0*p.x*p.y) + uv;
+    t = vec2(t.x*t.x - t.y*t.y, 2.0*t.x*t.y) + p;
   }
   return -1;
 }
@@ -53,18 +53,18 @@ int mandelbrot(in vec2 uv) {
 void setColor(out vec4 fragColor, in vec4 fragCoord) {
   vec2 c = resolution*0.5;
   float scale = resolution.y;
-  vec2 offset = vec2(-1.0, 0.3);
-  float zoom = 10.0;
-  vec2 uv = (fragCoord.xy - c)/(scale*zoom) + offset;
+  const vec2 offset = vec2(-1.0, 0.3);
+  const float zoom = 10.0;
+  vec2 p = (fragCoord.xy - c)/(scale*zoom) + offset;
 
-  int iterations = mandelbrot(uv);
+  int iterations = mandelbrot(p);
   if (iterations < 0) {
     fragColor = vec4(0.0, 0.0, 0.0, 1.0);
     return;
   }
 
   float value = float(iterations)/36.0;
-  float speed = 1.0/2500.0;
+  const float speed = 1.0/2500.0;
   float hue = fract(value + time*speed);
   vec3 rgb = hsv2rgb(vec3(hue, 1.0, 1.0));
   fragColor = vec4(rgb, 1.0);
@@ -74,13 +74,15 @@ void setColor(out vec4 fragColor, in vec4 fragCoord) {
 function makeRainbowFragment(valueSegment) {
   return `
 void setColor(out vec4 fragColor, in vec4 fragCoord) {
-  vec2 p = fragCoord.xy - resolution*0.5;
+  vec2 c = resolution*0.5;
+  float scale = min(resolution.x, resolution.y);
+  vec2 p = (fragCoord.xy - c)/scale;
   
   ${valueSegment}
 
-  float spread = user.a;
-  float speed = user.b;
-  float hue = fract(value*spread + time*speed);
+  const float spread = 1.0/200.0;
+  const float speed = 1.0/4000.0;
+  float hue = fract(value*5.0 + time*speed);
   vec3 rgb = hsv2rgb(vec3(hue, 1.0, 1.0));
   fragColor = vec4(rgb, 1.0);
 }`.trim();
