@@ -120,17 +120,15 @@ class Graphics3D {
     vertex: null,
     index: null,
   };
-  #userInputs;
   #mouse;
   
-  constructor(canvas, mouse, userInputs) {
+  constructor(canvas, mouse) {
     const gl = Graphics3D.#getGL(canvas);
     if (!gl) {
       throw 'Unable to get WebGL context';
     }
     this.#gl = gl;
     this.#mouse = mouse;
-    this.#userInputs = userInputs;
     
     for (const name in fragmentsMain) {
       const fragment = fragmentsMain[name];
