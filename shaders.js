@@ -80,9 +80,9 @@ void setColor(out vec4 fragColor, in vec4 fragCoord) {
   
   ${valueSegment}
 
-  const float spread = 1.0/200.0;
+  const float spread = 5.0;
   const float speed = 1.0/4000.0;
-  float hue = fract(value*5.0 + time*speed);
+  float hue = fract(value*spread + time*speed);
   vec3 rgb = hsv2rgb(vec3(hue, 1.0, 1.0));
   fragColor = vec4(rgb, 1.0);
 }`.trim();
