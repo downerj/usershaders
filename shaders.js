@@ -29,13 +29,7 @@ vec3 hsv2rgb(in vec3 hsv) {
 uniform vec2 resolution;
 uniform float time;
 uniform vec2 mouse;
-uniform struct {
-  float a;
-  float b;
-  float c;
-  float d;
-  float e;
-} user;`;
+`.trim();
 
 const mandelbrotFragment = `
 int mandelbrot(in vec2 p) {

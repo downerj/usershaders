@@ -6,11 +6,6 @@ class ProgramData {
   #resolutionLocation = null;
   #timeLocation = null;
   #mouseLocation = null;
-  #userALocation = null;
-  #userBLocation = null;
-  #userCLocation = null;
-  #userDLocation = null;
-  #userELocation = null;
 
   constructor(gl, fragment) {
     this.#gl = gl;
@@ -29,11 +24,6 @@ class ProgramData {
     this.#resolutionLocation = gl.getUniformLocation(this.#program, 'resolution');
     this.#timeLocation = gl.getUniformLocation(this.#program, 'time');
     this.#mouseLocation = gl.getUniformLocation(this.#program, 'mouse');
-    this.#userALocation = gl.getUniformLocation(this.#program, 'user.a');
-    this.#userBLocation = gl.getUniformLocation(this.#program, 'user.b');
-    this.#userCLocation = gl.getUniformLocation(this.#program, 'user.c');
-    this.#userDLocation = gl.getUniformLocation(this.#program, 'user.d');
-    this.#userELocation = gl.getUniformLocation(this.#program, 'user.e');
   }
 
   get fragment() {
@@ -58,26 +48,6 @@ class ProgramData {
 
   get mouseLocation() {
     return this.#mouseLocation;
-  }
-
-  get userALocation() {
-    return this.#userALocation;
-  }
-
-  get userBLocation() {
-    return this.#userBLocation;
-  }
-
-  get userCLocation() {
-    return this.#userCLocation;
-  }
-
-  get userDLocation() {
-    return this.#userDLocation;
-  }
-
-  get userELocation() {
-    return this.#userELocation;
   }
 
   #createShader(type, source) {
@@ -258,26 +228,6 @@ class Graphics3D {
       this.#programData.mouseLocation,
       this.#mouse.x,
       gl.canvas.clientHeight - this.#mouse.y
-    );
-    gl.uniform1f(
-      this.#programData.userALocation,
-      this.#userInputs.a
-    );
-    gl.uniform1f(
-      this.#programData.userBLocation,
-      this.#userInputs.b
-    );
-    gl.uniform1f(
-      this.#programData.userCLocation,
-      this.#userInputs.c
-    );
-    gl.uniform1f(
-      this.#programData.userDLocation,
-      this.#userInputs.d
-    );
-    gl.uniform1f(
-      this.#programData.userELocation,
-      this.#userInputs.e
     );
     
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.#buffers.index);

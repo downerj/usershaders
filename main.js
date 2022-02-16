@@ -39,17 +39,10 @@ const storage = new class {
 class Application {
   #graphics;
   #timer = new IntervalTimer(this.#onTick.bind(this), 10);
-  mouse = {x: 0, y: 0};
-  userInputs = {
-    a: 0.005,
-    b: 0.00025,
-    c: 0,
-    d: 0,
-    e: 0,
-  };
+  #mouse = {x: 0, y: 0};
   
   constructor(canvas) {
-    this.#graphics = new Graphics3D(canvas, this.mouse, this.userInputs);
+    this.#graphics = new Graphics3D(canvas, this.#mouse);
     let selectedFragment = storage.getLocalItem('selectedProgram');
     if (!selectedFragment) {
       const defaultProgram = 'Hyperbolas A';
@@ -68,8 +61,8 @@ class Application {
   }
 
   mouseMove(x, y) {
-    this.mouse.x = x;
-    this.mouse.y = y;
+    this.#mouse.x = x;
+    this.#mouse.y = y;
   }
 
   updateFragment(name, fragment) {
