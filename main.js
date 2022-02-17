@@ -40,14 +40,14 @@ class Application {
   #graphics;
   #timer = new IntervalTimer(this.#onTick.bind(this), 10);
   #mouse = {x: 0, y: 0};
-  
+  static #defaultProgram = 'Mandelbrot Set';
+
   constructor(canvas) {
     this.#graphics = new Graphics3D(canvas, this.#mouse);
     let selectedFragment = storage.getLocalItem('selectedProgram');
     if (!selectedFragment) {
-      const defaultProgram = 'Hyperbolas A';
-      storage.setLocalItem('selectdProgram', defaultProgram);
-      selectedFragment = defaultProgram;
+      storage.setLocalItem('selectdProgram', Application.#defaultProgram);
+      selectedFragment = Application.#defaultProgram;
     }
     this.#graphics.setFragment(selectedFragment);
   }
