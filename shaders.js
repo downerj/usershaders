@@ -113,9 +113,9 @@ void setColor(out vec4 fragColor, in vec4 fragCoord) {
     return;
   }
 
-  float value = float(iterations)/36.0;
+  float value = float(iterations)/-36.0;
   vec3 hsv = vec3(value, 1.0, 1.0);
-  fragColor = hsvCycled2rgba(hsv, 1.0, 1.0/4000.0);
+  fragColor = hsvCycled2rgba(hsv, 1.0, -1.0/4000.0);
 }
 `.trim();
 
