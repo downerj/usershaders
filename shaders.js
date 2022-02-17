@@ -22,27 +22,22 @@ precision mediump float;
 const vec2 R = vec2(1.0, 0.0);
 const vec2 I = vec2(0.0, 1.0);
 
-vec3 hsv2rgb(in vec3 hsv) {
+uniform vec2 resolution;
+uniform float time;
+uniform vec2 mouse;
+
+vec4 hsv2rgba(in vec3 hsv) {
   float h = hsv.x;
   float s = hsv.y;
   float v = hsv.z;
   vec3 k = vec3(1.0, 2.0/3.0, 1.0/3.0);
   vec3 p = clamp(abs(6.0*fract(h - k) - 3.0) - 1.0, 0.0, 1.0);
-  return v * mix(k.xxx, p, s);
+  return vec4(v * mix(k.xxx, p, s), 1.0);
 }
 
-vec3 complexColor(vec2 point) {
-  float x = point.x;
-  float y = point.y;
-  float r = sqrt(x*x + y*y);
-  float a = atan(y, x)*RAD_TO_DEG;
-  
-  const float satRatio = 0.0625;
-  float hue = a / 360.0;
-  float sat = 1.0 - pow(satRatio, r);
-  const float val = 1.0;
-  
-  return hsv2rgb(vec3(hue, sat, val));
+vec4 hsvCycled2rgba(in vec3 hsv, in float spread, in float speed) {
+  hsv.x = fract(hsv.x*spread + time*speed);
+  return hsv2rgba(hsv);
 }
 
 vec2 cMul(vec2 a, vec2 b) {
@@ -77,9 +72,19 @@ vec2 cRotate(vec2 z, float degrees) {
   return cPolar(r, th + degrees*DEG_TO_RAD);
 }
 
-uniform vec2 resolution;
-uniform float time;
-uniform vec2 mouse;
+vec3 complex2hsv(vec2 point) {
+  float x = point.x;
+  float y = point.y;
+  float r = sqrt(x*x + y*y);
+  float a = atan(y, x)*RAD_TO_DEG;
+  
+  const float satRatio = 0.0625;
+  float hue = a/360.0;
+  float sat = 1.0 - pow(satRatio, r);
+  const float val = 1.0;
+  
+  return vec3(hue, sat, val);
+}
 `.trim();
 
 const mandelbrotFragment = `
@@ -109,10 +114,8 @@ void setColor(out vec4 fragColor, in vec4 fragCoord) {
   }
 
   float value = float(iterations)/36.0;
-  const float speed = 1.0/2500.0;
-  float hue = fract(value + time*speed);
-  vec3 rgb = hsv2rgb(vec3(hue, 1.0, 1.0));
-  fragColor = vec4(rgb, 1.0);
+  vec3 hsv = vec3(value, 1.0, 1.0);
+  fragColor = hsvCycled2rgba(hsv, 1.0, 1.0/4000.0);
 }
 `.trim();
 
@@ -123,7 +126,6 @@ vec2 func(vec2 z) {
   vec2 b2 = cMul(b, b);
   vec2 d = cMul(z, z) + 2.0*R + 2.0*I;
   vec2 o = cDiv(cMul(a, b2), d);
-  // float angle = mod(uTime / 20.0, 360.0);
   return o;
 }
 
@@ -132,7 +134,9 @@ void setColor(out vec4 fragColor, in vec4 fragCoord) {
   float scale = 0.1*min(resolution.x, resolution.y);
   vec2 z = (fragCoord.xy - c)/scale;
   vec2 o = func(z);
-  fragColor = vec4(complexColor(o), 1.0);
+  vec3 hsv = complex2hsv(o);
+  
+  fragColor = hsvCycled2rgba(hsv, 2.0, 1.0/6000.0);
 }
 `.trim();
 
@@ -145,11 +149,8 @@ void setColor(out vec4 fragColor, in vec4 fragCoord) {
   
   ${valueSegment}
 
-  const float spread = 5.0;
-  const float speed = 1.0/4000.0;
-  float hue = fract(value*spread + time*speed);
-  vec3 rgb = hsv2rgb(vec3(hue, 1.0, 1.0));
-  fragColor = vec4(rgb, 1.0);
+  vec3 hsv = vec3(value, 1.0, 1.0);
+  fragColor = hsvCycled2rgba(hsv, 5.0, 1.0/4000.0);
 }`.trim();
 }
 
