@@ -70,10 +70,26 @@ div.button {
   width: var(--button-width);
   height: var(--button-width);
   background-color: black;
+  color: white;
   cursor: pointer;
   margin: var(--button-margin);
   border: 1px solid white;
   border-radius: 5px;
+}
+
+div.button:hover {
+  background-color: white;
+  color: black;
+}
+
+div.button svg path {
+  fill: white;
+  stroke: white;
+}
+
+div.button:hover svg path {
+  fill: black;
+  stroke: black;
 }
 
 button {
