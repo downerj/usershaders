@@ -111,8 +111,15 @@ window.addEventListener('load', () => {
   });
 
   const menuToggle = document.getElementById('menu-toggle');
+  menuToggle.checked = false;
   cvs.addEventListener('click', () => {
     menuToggle.checked = false;
+  });
+  const menuOpenButton = document.getElementById('menu-open-button');
+  const menuCloseButton = document.getElementById('menu-close-button');
+  menuToggle.addEventListener('input', () => {
+    menuOpenButton.hidden = menuToggle.checked;
+    menuCloseButton.hidden = !menuToggle.checked;
   });
 
   const fragmentDropdown = document.getElementById('fragment-dropdown');
