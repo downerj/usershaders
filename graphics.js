@@ -1,7 +1,7 @@
 class ProgramData {
   #gl;
   #fragment;
-  #program;
+  #program = null;
   #positionLocation = null;
   #resolutionLocation = null;
   #timeLocation = null;
@@ -9,25 +9,33 @@ class ProgramData {
 
   constructor(gl, fragment) {
     this.#gl = gl;
-    this.update(fragment);
+    this.#fragment = fragment;
   }
   
-  update(fragment) {
+  prepareProgram() {
     const gl = this.#gl;
-    this.#fragment = fragment;
-    this.#program = this.#createProgram(vertexSourceMain, makeFragmentSource(fragment));
+    this.#program = this.#createProgram(vertexSourceMain, makeFragmentSource(this.#fragment));
     if (this.#program === null) {
       throw 'Error construction program from fragment';
     }
-
     this.#positionLocation = gl.getAttribLocation(this.#program, 'position');
     this.#resolutionLocation = gl.getUniformLocation(this.#program, 'resolution');
     this.#timeLocation = gl.getUniformLocation(this.#program, 'time');
     this.#mouseLocation = gl.getUniformLocation(this.#program, 'mouse');
   }
 
+  releaseProgram() {
+    const gl = this.#gl;
+    gl.deleteProgram(this.#program);
+    this.#program = null;
+  }
+
   get fragment() {
     return this.#fragment;
+  }
+
+  set fragment(value) {
+    this.#fragment = value;
   }
 
   get program() {
@@ -151,7 +159,7 @@ class Graphics3D {
   updateFragment(name, fragment) {
     try {
       if (name in this.#programDatas) {
-        this.#programDatas[name].update(fragment);
+        this.#programDatas[name].fragment = fragment;
       } else {
         this.#programDatas[name] = new ProgramData(this.#gl, fragment);
       }
@@ -170,8 +178,14 @@ class Graphics3D {
     } else if (!(name in this.#programDatas)) {
       return false;
     }
+
+    if (this.#programData !== null) {
+      this.#programData.releaseProgram();
+    }
+
     this.#programName = name;
     this.#programData = this.#programDatas[name];
+    this.#programData.prepareProgram();
     return true;
   }
   
