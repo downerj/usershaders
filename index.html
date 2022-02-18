@@ -31,10 +31,9 @@
     <label for="menu-toggle">
       <div id="menu-open-button" class="overlay-button button-1" title="Open menu">
         <svg viewbox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-          <path
-            d="M 20,10 A 10 10 180 0 0 20,30 H 80 A 10 10 180 0 0 80,10 Z
-               M 20,40 A 10 10 180 0 0 20,60 H 80 A 10 10 180 0 0 80,40 Z
-               M 20,70 A 10 10 180 0 0 20,90 H 80 A 10 10 180 0 0 80,70 Z"/>
+          <path d="M 20,10 A 10 10 180 0 0 20,30 H 80 A 10 10 180 0 0 80,10 Z"/>
+          <path d="M 20,40 A 10 10 180 0 0 20,60 H 80 A 10 10 180 0 0 80,40 Z"/>
+          <path d="M 20,70 A 10 10 180 0 0 20,90 H 80 A 10 10 180 0 0 80,70 Z"/>
         </svg>
       </div>
       <div id="menu-close-button" class="overlay-button button-1" title="Close menu" hidden>
@@ -53,7 +52,24 @@
       </div>
     </label>
     <div id="fullscreen-button" class="overlay-button button-2">
-
+      <svg viewbox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <path
+          d="M 40,10
+             A 10 10 180 0 0 40,30
+             H 70 V 60
+             A 10 10 180 0 0 90,60
+             V 20
+             A 10 10 90 0 0 80,10
+             H 40"/>
+        <path
+          d="M 10,40
+             V 80
+             A 10 10 90 0 0 20,90
+             H 60
+             A 10 10 180 0 0 60,70
+             H 30 V 40
+             A 10 10 180 0 0 10,40"/>
+      </svg>
     </div> 
     <div class="drawing-area">
       <canvas id="cvs">
