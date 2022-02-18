@@ -103,9 +103,16 @@ int mandelbrot(in vec2 p) {
 void setColor(out vec4 fragColor, in vec4 fragCoord) {
   vec2 c = resolution*0.5;
   float scale = resolution.y;
+  vec2 uv = fragCoord.xy;
+
   const vec2 offset = vec2(-1.0, 0.3);
-  const float zoom = 10.0;
-  vec2 p = (fragCoord.xy - c)/(scale*zoom) + offset;
+  const float zoom = 1.0;
+  
+  // Standard view.
+  // vec2 offset = vec2(-1.0, 0.0);
+  // const float zoom = -0.5;
+
+  vec2 p = (uv - c)/(scale*pow(10.0, zoom)) + offset;
 
   int iterations = mandelbrot(p);
   if (iterations < 0) {
