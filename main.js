@@ -122,6 +122,11 @@ window.addEventListener('load', () => {
     menuCloseButton.hidden = !menuToggle.checked;
   });
 
+  const fullscreenButton = document.getElementById('fullscreen-button');
+  fullscreenButton.addEventListener('click', () => {
+    cvs.requestFullscreen();
+  });
+
   const fragmentDropdown = document.getElementById('fragment-dropdown');
   const fragmentInput = document.getElementById('fragment-input');
 
