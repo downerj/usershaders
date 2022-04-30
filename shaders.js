@@ -1,3 +1,32 @@
+const vertexSourceScreen = `#version 100
+precision highp float;
+
+attribute vec2 position;
+attribute vec2 textureCoordIn;
+varying vec2 textureCoord;
+
+void main() {
+  gl_Position = vec4(position, 0.0, 1.0);
+  textureCoord = textureCoordIn;
+}
+`;
+
+const fragmentSourceScreen = `#version 100
+#ifdef GL_FRAGMENT_PRECISION_HIGH
+precision highp float;
+#else
+precision mediump float;
+#endif
+
+varying vec2 textureCoord;
+
+uniform sampler2D texture;
+
+void main() {
+  gl_FragColor = texture2D(texture, textureCoord);
+}
+`;
+
 const vertexSourceMain = `#version 100
 precision highp float;
 
