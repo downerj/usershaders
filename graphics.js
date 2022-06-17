@@ -14,7 +14,7 @@ class ProgramData {
   
   prepareProgram() {
     const gl = this.#gl;
-    this.#program = this.#createProgram(vertexSourceMain, makeFragmentSource(this.#fragment));
+    this.#program = this.#createProgram(shaderSources.vertex, this.#fragment);
     if (this.#program === null) {
       throw 'Error construction program from fragment';
     }
@@ -138,8 +138,8 @@ class Graphics3D {
     this.#gl = gl;
     this.#mouse = mouse;
     
-    for (const name in fragmentsMain) {
-      const fragment = fragmentsMain[name];
+    for (const name in shaderSources.fragment.provided) {
+      const fragment = shaderSources.fragment.provided[name];
       this.updateFragment(name, fragment);
     }
     this.setFragment(null);

@@ -1,4 +1,30 @@
-const vertexSourceMain = `#version 100
+const shaderSources = {
+  vertex: null,
+  fragmentIncludes: {
+    header: null,
+    complex: null,
+    coloring: null,
+    main: null,
+  },
+  fragment: {
+    provided: {
+      'Circle': null,
+      'Complex Graph A': null,
+      'Diagonal Lines': null,
+      'Hyperbolas Simple': null,
+      'Hyperbolas Chaotic': null,
+      'Mandelbrot Set': null,
+      'Parabolas': null,
+    },
+    user: {},
+  },
+};
+
+// //////////
+// VERTEX SHADER
+// //////////
+
+shaderSources.vertex = `#version 100
 precision highp float;
 
 attribute vec2 position;
@@ -8,37 +34,29 @@ void main(void) {
 }
 `;
 
-const fragmentSourceMainA = `#version 100
+// //////////
+// FRAGMENT SHADER INCLUDES
+// //////////
+
+shaderSources.fragmentIncludes.header = `#version 100
 #ifdef GL_FRAGMENT_PRECISION_HIGH
 precision highp float;
 #else
 precision mediump float;
 #endif
 
+uniform vec2 resolution;
+uniform float time;
+uniform vec2 mouse;
+`;
+
+shaderSources.fragmentIncludes.complex = `
 #define PI 3.141592653589793
 #define DEG_TO_RAD PI/180.0
 #define RAD_TO_DEG 180.0/PI
 
 const vec2 R = vec2(1.0, 0.0);
 const vec2 I = vec2(0.0, 1.0);
-
-uniform vec2 resolution;
-uniform float time;
-uniform vec2 mouse;
-
-vec4 hsv2rgba(in vec3 hsv) {
-  float h = hsv.x;
-  float s = hsv.y;
-  float v = hsv.z;
-  vec3 k = vec3(1.0, 2.0/3.0, 1.0/3.0);
-  vec3 p = clamp(abs(6.0*fract(h - k) - 3.0) - 1.0, 0.0, 1.0);
-  return vec4(v * mix(k.xxx, p, s), 1.0);
-}
-
-vec4 hsvCycled2rgba(in vec3 hsv, in float spread, in float speed) {
-  hsv.x = fract(hsv.x*spread + time*speed);
-  return hsv2rgba(hsv);
-}
 
 vec2 cMul(vec2 a, vec2 b) {
   return vec2(a.x*b.x - a.y*b.y, a.x*b.y + a.y*b.x);
@@ -85,9 +103,36 @@ vec3 complex2hsv(vec2 point) {
   
   return vec3(hue, sat, val);
 }
-`.trim();
+`;
 
-const mandelbrotFragment = `
+shaderSources.fragmentIncludes.coloring = `
+vec4 hsv2rgba(in vec3 hsv) {
+  float h = hsv.x;
+  float s = hsv.y;
+  float v = hsv.z;
+  vec3 k = vec3(1.0, 2.0/3.0, 1.0/3.0);
+  vec3 p = clamp(abs(6.0*fract(h - k) - 3.0) - 1.0, 0.0, 1.0);
+  return vec4(v * mix(k.xxx, p, s), 1.0);
+}
+
+vec4 hsvCycled2rgba(in vec3 hsv, in float spread, in float speed) {
+  hsv.x = fract(hsv.x*spread + time*speed);
+  return hsv2rgba(hsv);
+}
+`;
+
+shaderSources.fragmentIncludes.main = `
+void main(void) {
+  setColor(gl_FragColor, gl_FragCoord);
+}`;
+
+// //////////
+// FRAGMENT SHADERS (PROVIDED)
+// //////////
+
+shaderSources.fragment.provided['Mandelbrot Set'] = (
+  shaderSources.fragmentIncludes.header +
+  shaderSources.fragmentIncludes.coloring + `
 int mandelbrot(in vec2 p) {
   vec2 t = vec2(0.0, 0.0);
   const int maxIterations = 1000;
@@ -124,9 +169,13 @@ void setColor(out vec4 fragColor, in vec4 fragCoord) {
   vec3 hsv = vec3(value, 1.0, 1.0);
   fragColor = hsvCycled2rgba(hsv, 1.0, -1.0/4000.0);
 }
-`.trim();
+` + shaderSources.fragmentIncludes.main
+).trim();
 
-const complexFragmentA = `
+shaderSources.fragment.provided['Complex Graph A'] = (
+  shaderSources.fragmentIncludes.header +
+  shaderSources.fragmentIncludes.coloring +
+  shaderSources.fragmentIncludes.complex + `
 vec2 func(vec2 z) {
   vec2 a = cMul(z, z) - R;
   vec2 b = z - 2.0*R - I;
@@ -145,10 +194,17 @@ void setColor(out vec4 fragColor, in vec4 fragCoord) {
   
   fragColor = hsvCycled2rgba(hsv, 2.0, 1.0/6000.0);
 }
-`.trim();
+` + shaderSources.fragmentIncludes.main
+).trim();
+
+// //////////
+// FRAGMENT SHADERS (PROVIDED) (RAINBOWS)
+// //////////
 
 function makeRainbowFragment(valueSegment) {
-  return `
+  return (
+    shaderSources.fragmentIncludes.header +
+    shaderSources.fragmentIncludes.coloring + `
 void setColor(out vec4 fragColor, in vec4 fragCoord) {
   vec2 c = resolution*0.5;
   float scale = min(resolution.x, resolution.y);
@@ -158,25 +214,24 @@ void setColor(out vec4 fragColor, in vec4 fragCoord) {
 
   vec3 hsv = vec3(value, 1.0, 1.0);
   fragColor = hsvCycled2rgba(hsv, 5.0, 1.0/4000.0);
-}`.trim();
+}
+` + shaderSources.fragmentIncludes.main
+  ).trim();
 }
 
-const fragmentsMain = {
-  'Circle': makeRainbowFragment('float value = sqrt(p.x*p.x + p.y*p.y);'),
-  'Complex Graph A': complexFragmentA,
-  'Diagonal Lines': makeRainbowFragment('float value = p.y - p.x;'),
-  'Hyperbolas A': makeRainbowFragment('float value = sqrt(abs(p.x*p.x - p.y*p.y));'),
-  'Hyperbolas B': makeRainbowFragment('float value = p.x*p.x/p.y - p.y;'),
-  'Mandelbrot Set': mandelbrotFragment,
-  'Parabolas': makeRainbowFragment('float value = p.x*p.x/p.y;'),
-};
-
-const fragmentSourceMainB = `
-void main(void) {
-  setColor(gl_FragColor, gl_FragCoord);
-}`.trim();
-
-function makeFragmentSource(fragment) {
-  return fragmentSourceMainA + fragment + fragmentSourceMainB;
-}
+shaderSources.fragment.provided['Circle'] = makeRainbowFragment(
+  'float value = sqrt(p.x*p.x + p.y*p.y);'
+);
+shaderSources.fragment.provided['Diagonal Lines'] = makeRainbowFragment(
+  'float value = p.y - p.x;'
+);
+shaderSources.fragment.provided['Hyperbolas Simple'] = makeRainbowFragment(
+  'float value = sqrt(abs(p.x*p.x - p.y*p.y));'
+);
+shaderSources.fragment.provided['Hyperbolas Chaotic'] = makeRainbowFragment(
+  'float value = p.x*p.x/p.y - p.y;'
+);
+shaderSources.fragment.provided['Parabolas'] = makeRainbowFragment(
+  'float value = p.x*p.x/p.y;'
+);
 

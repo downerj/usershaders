@@ -112,14 +112,16 @@ window.addEventListener('load', () => {
 
   const menuToggle = document.getElementById('menu-toggle');
   menuToggle.checked = false;
-  cvs.addEventListener('click', () => {
-    menuToggle.checked = false;
-  });
   const menuOpenButton = document.getElementById('menu-open-button');
   const menuCloseButton = document.getElementById('menu-close-button');
   menuToggle.addEventListener('input', () => {
     menuOpenButton.hidden = menuToggle.checked;
     menuCloseButton.hidden = !menuToggle.checked;
+  });
+  cvs.addEventListener('click', () => {
+    menuToggle.checked = false;
+    menuOpenButton.hidden = false;
+    menuCloseButton.hidden = true;
   });
 
   const fullscreenButton = document.getElementById('fullscreen-button');
@@ -151,24 +153,6 @@ window.addEventListener('load', () => {
     const selectedFragment = fragmentDropdown.selectedOptions[0].value;
     app.setFragment(selectedFragment);
     fragmentInput.value = app.getFragmentFor(selectedFragment);
-  });
-
-  const viewIncludedButton = document.getElementById('view-included-button');
-  const viewFragmentButton = document.getElementById('view-fragment-button');
-  const includedInput = document.getElementById('included-input');
-  includedInput.value = fragmentSourceMainA;
-
-  viewIncludedButton.addEventListener('click', () => {
-    viewFragmentButton.hidden = false;
-    fragmentInput.hidden = true;
-    viewIncludedButton.hidden = true;
-    includedInput.hidden = false;
-  });
-  viewFragmentButton.addEventListener('click', () => {
-    viewFragmentButton.hidden = true;
-    fragmentInput.hidden = false;
-    viewIncludedButton.hidden = false;
-    includedInput.hidden = true;
   });
 
   app.run();
