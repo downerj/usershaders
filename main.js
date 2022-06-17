@@ -112,14 +112,16 @@ window.addEventListener('load', () => {
 
   const menuToggle = document.getElementById('menu-toggle');
   menuToggle.checked = false;
-  cvs.addEventListener('click', () => {
-    menuToggle.checked = false;
-  });
   const menuOpenButton = document.getElementById('menu-open-button');
   const menuCloseButton = document.getElementById('menu-close-button');
   menuToggle.addEventListener('input', () => {
     menuOpenButton.hidden = menuToggle.checked;
     menuCloseButton.hidden = !menuToggle.checked;
+  });
+  cvs.addEventListener('click', () => {
+    menuToggle.checked = false;
+    menuOpenButton.hidden = false;
+    menuCloseButton.hidden = true;
   });
 
   const fullscreenButton = document.getElementById('fullscreen-button');
