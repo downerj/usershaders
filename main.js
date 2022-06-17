@@ -153,24 +153,6 @@ window.addEventListener('load', () => {
     fragmentInput.value = app.getFragmentFor(selectedFragment);
   });
 
-  const viewIncludedButton = document.getElementById('view-included-button');
-  const viewFragmentButton = document.getElementById('view-fragment-button');
-  const includedInput = document.getElementById('included-input');
-  includedInput.value = shaderSources.fragment.provided['Complex Graph A'];
-
-  viewIncludedButton.addEventListener('click', () => {
-    viewFragmentButton.hidden = false;
-    fragmentInput.hidden = true;
-    viewIncludedButton.hidden = true;
-    includedInput.hidden = false;
-  });
-  viewFragmentButton.addEventListener('click', () => {
-    viewFragmentButton.hidden = true;
-    fragmentInput.hidden = false;
-    viewIncludedButton.hidden = false;
-    includedInput.hidden = true;
-  });
-
   app.run();
 });
 
