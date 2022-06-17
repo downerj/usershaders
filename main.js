@@ -156,7 +156,7 @@ window.addEventListener('load', () => {
   const viewIncludedButton = document.getElementById('view-included-button');
   const viewFragmentButton = document.getElementById('view-fragment-button');
   const includedInput = document.getElementById('included-input');
-  includedInput.value = fragmentSourceMainA;
+  includedInput.value = shaderSources.fragment.provided['Complex Graph A'];
 
   viewIncludedButton.addEventListener('click', () => {
     viewFragmentButton.hidden = false;
