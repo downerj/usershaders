@@ -52,8 +52,8 @@ class Application {
     this.#graphics.setFragment(selectedFragment);
   }
   
-  run() {
-    this.#timer.resume();
+  run(iterations = Infinity) {
+    this.#timer.resume(iterations);
   }
   
   pause() {
@@ -129,19 +129,6 @@ window.addEventListener('load', () => {
     cvs.requestFullscreen();
   });
 
-  const pauseButton = document.getElementById('pause-button');
-  const playButton = document.getElementById('play-button');
-  pauseButton.addEventListener('click', () => {
-    pauseButton.hidden = true;
-    playButton.hidden = false;
-    app.pause();
-  });
-  playButton.addEventListener('click', () => {
-    pauseButton.hidden = false;
-    playButton.hidden = true;
-    app.run();
-  });
-
   const fragmentDropdown = document.getElementById('fragment-dropdown');
   const fragmentInput = document.getElementById('fragment-input');
 
@@ -168,6 +155,34 @@ window.addEventListener('load', () => {
     fragmentInput.value = app.getFragmentFor(selectedFragment);
   });
 
-  app.run();
+  const pauseButton = document.getElementById('pause-button');
+  const playButton = document.getElementById('play-button');
+  pauseButton.addEventListener('click', () => {
+    pauseButton.hidden = true;
+    playButton.hidden = false;
+    app.pause();
+    storage.setLocalItem('running', false);
+  });
+  playButton.addEventListener('click', () => {
+    pauseButton.hidden = false;
+    playButton.hidden = true;
+    app.run();
+    storage.setLocalItem('running', true);
+  });
+
+  let running = storage.getLocalItem('running');
+  if (running === null) {
+    running = true;
+    storage.setLocalItem('running', running);
+  }
+  if (running !== 'false') {
+    app.run();
+    playButton.hidden = true;
+    pauseButton.hidden = false;
+  } else {
+    app.run(2);
+    playButton.hidden = false;
+    pauseButton.hidden = true;
+  }
 });
 

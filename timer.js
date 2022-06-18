@@ -3,16 +3,20 @@ class IntervalTimer {
   #interval;
   #handle = null;
   #previous = 0;
+  #maxIterations;
+  #iterations;
   
   constructor(callback, interval) {
     this.#callback = callback;
     this.#interval = interval;
   }
-  
-  resume() {
+
+  resume(iterations = Infinity) {
     if (this.#handle !== null) {
       return;
     }
+    this.#maxIterations = iterations;
+    this.#iterations = 0;
     this.#update();
   }
   
@@ -24,7 +28,12 @@ class IntervalTimer {
   }
   
   #update() {
-    this.#handle = window.requestAnimationFrame(this.#onAnimate.bind(this));
+    if (this.#maxIterations === Infinity || this.#iterations < this.#maxIterations) {
+      this.#iterations++;
+      this.#handle = window.requestAnimationFrame(this.#onAnimate.bind(this));
+    } else {
+      this.#cancel();
+    }
   }
   
   #cancel() {
