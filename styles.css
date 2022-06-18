@@ -121,6 +121,12 @@ div.button-2 {
   left: 0;
 }
 
+div.button-3 {
+  position: fixed;
+  top: calc(2*(var(--button-margin) + var(--button-width)));
+  left: 0;
+}
+
 div.input-area {
   display: flex;
   flex-direction: column;

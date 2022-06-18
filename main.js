@@ -129,6 +129,19 @@ window.addEventListener('load', () => {
     cvs.requestFullscreen();
   });
 
+  const pauseButton = document.getElementById('pause-button');
+  const playButton = document.getElementById('play-button');
+  pauseButton.addEventListener('click', () => {
+    pauseButton.hidden = true;
+    playButton.hidden = false;
+    app.pause();
+  });
+  playButton.addEventListener('click', () => {
+    pauseButton.hidden = false;
+    playButton.hidden = true;
+    app.run();
+  });
+
   const fragmentDropdown = document.getElementById('fragment-dropdown');
   const fragmentInput = document.getElementById('fragment-input');
 
