@@ -40,7 +40,7 @@ class Application {
   #graphics;
   #timer = new IntervalTimer(this.#onTick.bind(this), 10);
   #mouse = {x: 0, y: 0};
-  static #defaultProgram = 'Mandelbrot Set';
+  static #defaultProgram = 'Complex Graph A';
 
   constructor(canvas) {
     this.#graphics = new Graphics3D(canvas, this.#mouse);

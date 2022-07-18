@@ -90,7 +90,7 @@ vec2 cRotate(vec2 z, float degrees) {
   return cPolar(r, th + degrees*DEG_TO_RAD);
 }
 
-vec3 complex2hsv(vec2 point) {
+vec3 complex2hsv(vec2 point, bool contours) {
   float x = point.x;
   float y = point.y;
   float r = sqrt(x*x + y*y);
@@ -99,7 +99,27 @@ vec3 complex2hsv(vec2 point) {
   const float satRatio = 0.0625;
   float hue = a/360.0;
   float sat = 1.0 - pow(satRatio, r);
-  const float val = 1.0;
+  if (!contours) {
+    return vec3(hue, sat, 1.0);
+  }
+  
+  float val = 0.5 + mod(r, 10.0)/10.0;
+
+  float m = mod(r, 1.0);
+  if (r > 1.0 && m >= 0.0 && m <= 0.25) {
+    val = 0.5;
+  }
+
+  float n = mod(a, 5.0);
+  if (n >= 0.0 && n <= 0.5) {
+    val = 0.75;
+  }
+
+  float p = mod(a, 20.0);
+  if (p >= 0.0 && p <= 1.0) {
+    sat = 0.25;
+    val = 1.0;
+  }
   
   return vec3(hue, sat, val);
 }
@@ -190,7 +210,27 @@ void setColor(out vec4 fragColor, in vec4 fragCoord) {
   float scale = 0.1*min(resolution.x, resolution.y);
   vec2 z = (fragCoord.xy - c)/scale;
   vec2 o = func(z);
-  vec3 hsv = complex2hsv(o);
+  vec3 hsv = complex2hsv(o, true);
+  
+  fragColor = hsvCycled2rgba(hsv, 2.0, 1.0/6000.0);
+}
+` + shaderSources.fragmentIncludes.main
+).trim();
+
+shaderSources.fragment.provided['Complex Graph B'] = (
+  shaderSources.fragmentIncludes.header +
+  shaderSources.fragmentIncludes.coloring +
+  shaderSources.fragmentIncludes.complex + `
+vec2 func(vec2 z) {
+  return 2.0*I + R + cMul(z, z);
+}
+
+void setColor(out vec4 fragColor, in vec4 fragCoord) {
+  vec2 c = resolution*0.5;
+  float scale = 0.1*min(resolution.x, resolution.y);
+  vec2 z = (fragCoord.xy - c)/scale;
+  vec2 o = func(z);
+  vec3 hsv = complex2hsv(o, true);
   
   fragColor = hsvCycled2rgba(hsv, 2.0, 1.0/6000.0);
 }
