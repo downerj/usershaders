@@ -90,38 +90,58 @@ vec2 cRotate(vec2 z, float degrees) {
   return cPolar(r, th + degrees*DEG_TO_RAD);
 }
 
-vec3 complex2hsv(vec2 point, bool contours) {
+#define SATURATION_RATIO 0.0625
+#define CYCLE_SPEED 0.1
+
+#define CONTOURS
+#ifdef CONTOURS
+#define CONTOUR_R_FREQUENCY 2.0
+#define CONTOUR_R_WIDTH 0.25
+#define CONTOUR_A_FREQUENCY 5.0
+#define CONTOUR_A_WIDTH 0.5
+#define CONTOUR_A2_FREQUENCY 20.0
+#define CONTOUR_A2_WIDTH 1.0
+#define CONTOUR_HSV_VALUE_MIN 0.5
+#define CONTOUR_HSV_VALUE_MAX 1.0
+#define CONTOUR_R_MOD 4.0
+#define CONTOUR_R_DIVISOR 8.0
+#endif
+
+#define OFFSET_X 0.0
+#define OFFSET_Y 0.0
+#define SCALE 0.15
+
+vec3 complex2hsv(vec2 point) {
   float x = point.x;
   float y = point.y;
   float r = sqrt(x*x + y*y);
   float a = atan(y, x)*RAD_TO_DEG;
-  
-  const float satRatio = 0.0625;
+
   float hue = a/360.0;
-  float sat = 1.0 - pow(satRatio, r);
-  if (!contours) {
-    return vec3(hue, sat, 1.0);
-  }
-  
-  float val = 0.5 + mod(r, 10.0)/10.0;
-
-  float m = mod(r, 1.0);
-  if (r > 1.0 && m >= 0.0 && m <= 0.25) {
-    val = 0.5;
-  }
-
-  float n = mod(a, 5.0);
-  if (n >= 0.0 && n <= 0.5) {
+  float sat = 1.0 - pow(SATURATION_RATIO, r);
+#ifndef CONTOURS
+  return vec3(hue, sat, 1.0);
+#else
+  float val = CONTOUR_HSV_VALUE_MIN + mod(r, CONTOUR_R_MOD)/CONTOUR_R_DIVISOR;
+  float n = mod(a, CONTOUR_A_FREQUENCY);
+  if (n >= 0.0 && n <= CONTOUR_A_WIDTH) {
     val = 0.75;
   }
-
-  float p = mod(a, 20.0);
-  if (p >= 0.0 && p <= 1.0) {
+  float m = mod(r, CONTOUR_R_FREQUENCY);
+  if (r > 1.0 && m >= 0.0 && m <= CONTOUR_R_WIDTH) {
+    val = 0.5;
+  }
+  float p = mod(a, CONTOUR_A2_FREQUENCY);
+  if (p >= 0.0 && p <= CONTOUR_A2_WIDTH) {
     sat = 0.25;
     val = 1.0;
+  } else if (sat < 0.5) {
+    val = mix(val, 1.0 - sat, 1.0);
   }
-  
+
+  val = clamp(val, CONTOUR_HSV_VALUE_MIN, CONTOUR_HSV_VALUE_MAX);
   return vec3(hue, sat, val);
+#endif
 }
 `;
 
@@ -192,10 +212,13 @@ void setColor(out vec4 fragColor, in vec4 fragCoord) {
 ` + shaderSources.fragmentIncludes.main
 ).trim();
 
-shaderSources.fragment.provided['Complex Graph A'] = (
+shaderSources.fragment.provided['Complex Graphs'] = (
   shaderSources.fragmentIncludes.header +
   shaderSources.fragmentIncludes.coloring +
   shaderSources.fragmentIncludes.complex + `
+#define FUNCTION_A
+
+#ifdef FUNCTION_A
 vec2 func(vec2 z) {
   vec2 a = cMul(z, z) - R;
   vec2 b = z - 2.0*R - I;
@@ -204,35 +227,24 @@ vec2 func(vec2 z) {
   vec2 o = cDiv(cMul(a, b2), d);
   return o;
 }
-
-void setColor(out vec4 fragColor, in vec4 fragCoord) {
-  vec2 c = resolution*0.5;
-  float scale = 0.1*min(resolution.x, resolution.y);
-  vec2 z = (fragCoord.xy - c)/scale;
-  vec2 o = func(z);
-  vec3 hsv = complex2hsv(o, true);
-  
-  fragColor = hsvCycled2rgba(hsv, 2.0, 1.0/6000.0);
-}
-` + shaderSources.fragmentIncludes.main
-).trim();
-
-shaderSources.fragment.provided['Complex Graph B'] = (
-  shaderSources.fragmentIncludes.header +
-  shaderSources.fragmentIncludes.coloring +
-  shaderSources.fragmentIncludes.complex + `
+#elif defined FUNCTION_B
 vec2 func(vec2 z) {
   return 2.0*I + R + cMul(z, z);
 }
+#elif defined FUNCTION_C
+vec2 func(vec2 z) {
+  return z;
+}
+#endif
 
 void setColor(out vec4 fragColor, in vec4 fragCoord) {
-  vec2 c = resolution*0.5;
-  float scale = 0.1*min(resolution.x, resolution.y);
+  vec2 c = resolution.xy*0.5 + vec2(OFFSET_X, OFFSET_Y);
+  float scale = SCALE*min(resolution.x, resolution.y);
   vec2 z = (fragCoord.xy - c)/scale;
   vec2 o = func(z);
-  vec3 hsv = complex2hsv(o, true);
-  
-  fragColor = hsvCycled2rgba(hsv, 2.0, 1.0/6000.0);
+  vec3 hsv = complex2hsv(o);
+
+  fragColor = hsvCycled2rgba(hsv, 2.0, CYCLE_SPEED);
 }
 ` + shaderSources.fragmentIncludes.main
 ).trim();
