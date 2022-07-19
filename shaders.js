@@ -91,7 +91,6 @@ vec2 cRotate(vec2 z, float degrees) {
 }
 
 #define SATURATION_RATIO 0.0625
-#define CYCLE_SPEED 0.1
 
 #define CONTOURS
 #ifdef CONTOURS
@@ -236,6 +235,8 @@ vec2 func(vec2 z) {
   return z;
 }
 #endif
+
+#define CYCLE_SPEED 0.0001
 
 void setColor(out vec4 fragColor, in vec4 fragCoord) {
   vec2 c = resolution.xy*0.5 + vec2(OFFSET_X, OFFSET_Y);

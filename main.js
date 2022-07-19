@@ -40,12 +40,13 @@ class Application {
   #graphics;
   #timer = new IntervalTimer(this.#onTick.bind(this), 10);
   #mouse = {x: 0, y: 0};
-  static #defaultProgram = 'Complex Graph A';
+  static #defaultProgram = 'Complex Graphs';
 
   constructor(canvas) {
     this.#graphics = new Graphics3D(canvas, this.#mouse);
     let selectedFragment = storage.getLocalItem('selectedProgram');
-    if (!selectedFragment) {
+    const selectionIsValid = selectedFragment in this.#graphics.availableFragments;
+    if (!selectedFragment || !selectionIsValid) {
       storage.setLocalItem('selectdProgram', Application.#defaultProgram);
       selectedFragment = Application.#defaultProgram;
     }
