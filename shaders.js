@@ -7,15 +7,7 @@ const shaderSources = {
     main: null,
   },
   fragment: {
-    provided: {
-      'Circle': null,
-      'Complex Graph A': null,
-      'Diagonal Lines': null,
-      'Hyperbolas Simple': null,
-      'Hyperbolas Chaotic': null,
-      'Mandelbrot Set': null,
-      'Parabolas': null,
-    },
+    provided: {},
     user: {},
   },
 };

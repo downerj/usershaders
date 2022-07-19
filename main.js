@@ -133,7 +133,9 @@ window.addEventListener('load', () => {
   const fragmentDropdown = document.getElementById('fragment-dropdown');
   const fragmentInput = document.getElementById('fragment-input');
 
-  for (const fragment of app.availableFragments) {
+  const availableFragments = app.availableFragments;
+  availableFragments.sort();
+  for (const fragment of availableFragments) {
     const option = document.createElement('OPTION');
     option.textContent = fragment;
     option.value = fragment;
