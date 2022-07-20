@@ -59,6 +59,23 @@ vec2 cDiv(vec2 a, vec2 b) {
   return vec2((a.x*b.x + a.y*b.y)/d, (a.y*b.x - a.x*b.y)/d);
 }
 
+vec2 cPowZ(in vec2 z, in int n) {
+	if (n == 0) {
+		return R;
+	}
+	vec2 res = R;
+	if (n > 1) {
+	  for (int i = 0; i < n; i++) {
+		  res = cMul(res, z);
+   	}
+  } else {
+   	for (int i = 0; i < n; i++) {
+   		res = cDiv(res, z);
+   	}
+  }
+	return res;
+}
+
 float cLen(vec2 z) {
   return sqrt(z.x*z.x + z.y*z.y);
 }
@@ -209,7 +226,7 @@ shaderSources.fragment.provided['Complex Graphs'] = (
   shaderSources.fragmentIncludes.header +
   shaderSources.fragmentIncludes.coloring +
   shaderSources.fragmentIncludes.complex + `
-#define FUNCTION_A
+#define FUNCTION_C
 
 #ifdef FUNCTION_A
 vec2 func(vec2 z) {
@@ -226,7 +243,7 @@ vec2 func(vec2 z) {
 }
 #elif defined FUNCTION_C
 vec2 func(vec2 z) {
-  return z;
+  return cPowZ(z, 3) - 25.0*R;
 }
 #endif
 
