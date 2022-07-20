@@ -120,7 +120,7 @@ vec3 complex2hsv(vec2 point) {
   // Radial curves.
   float m = mod(r + CONTOUR_R_WIDTH, CONTOUR_R_FREQUENCY);
   if (r > 1.0 && m <= 2.0*CONTOUR_R_WIDTH) {
-    val = mix(val, 0.5, 0.25);
+    val = 0.5;
   }
 
   // Bright perpendicular curves.
