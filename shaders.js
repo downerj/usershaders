@@ -127,7 +127,7 @@ vec3 complex2hsv(vec2 point) {
   float p = mod(a + CONTOUR_A2_WIDTH, CONTOUR_A2_FREQUENCY);
   if (p <= 2.0*CONTOUR_A2_WIDTH) {
     float sat2 = abs(p - CONTOUR_A2_WIDTH)/CONTOUR_A2_WIDTH;
-    sat = mix(sat, sat2, 1.0);
+    sat = mix(sat, sat2, 2.0);
     val = mix(val, 1.0, 0.5);
   } else if (sat < 0.5) {
     val = mix(val, 1.0 - sat, 1.0);
