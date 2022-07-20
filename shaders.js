@@ -230,6 +230,9 @@ vec2 func(vec2 z) {
 }
 #endif
 
+#define OFFSET_X 0.0
+#define OFFSET_Y 0.0
+#define SCALE 0.10
 #define CYCLE_SPEED 0.0001
 
 void setColor(out vec4 fragColor, in vec4 fragCoord) {
