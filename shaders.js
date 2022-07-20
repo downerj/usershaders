@@ -81,7 +81,6 @@ vec2 cRotate(vec2 z, float degrees) {
   float th = cArg(z);
   return cPolar(r, th + degrees*DEG_TO_RAD);
 }
-
 #define SATURATION_RATIO 0.0625
 
 #define CONTOURS
@@ -98,10 +97,6 @@ vec2 cRotate(vec2 z, float degrees) {
 #define CONTOUR_R_DIVISOR 8.0
 #endif
 
-#define OFFSET_X 0.0
-#define OFFSET_Y 0.0
-#define SCALE 0.15
-
 vec3 complex2hsv(vec2 point) {
   float x = point.x;
   float y = point.y;
@@ -113,19 +108,27 @@ vec3 complex2hsv(vec2 point) {
 #ifndef CONTOURS
   return vec3(hue, sat, 1.0);
 #else
+  // Dark -> colorful edges.
   float val = CONTOUR_HSV_VALUE_MIN + mod(r, CONTOUR_R_MOD)/CONTOUR_R_DIVISOR;
-  float n = mod(a, CONTOUR_A_FREQUENCY);
-  if (n >= 0.0 && n <= CONTOUR_A_WIDTH) {
+
+  // Perpendicular curves.
+  float n = mod(a + CONTOUR_A_WIDTH, CONTOUR_A_FREQUENCY);
+  if (n <= 2.0*CONTOUR_A_WIDTH) {
     val = 0.75;
   }
-  float m = mod(r, CONTOUR_R_FREQUENCY);
-  if (r > 1.0 && m >= 0.0 && m <= CONTOUR_R_WIDTH) {
-    val = 0.5;
+
+  // Radial curves.
+  float m = mod(r + CONTOUR_R_WIDTH, CONTOUR_R_FREQUENCY);
+  if (r > 1.0 && m <= 2.0*CONTOUR_R_WIDTH) {
+    val = mix(val, 0.5, 0.25);
   }
-  float p = mod(a, CONTOUR_A2_FREQUENCY);
-  if (p >= 0.0 && p <= CONTOUR_A2_WIDTH) {
-    sat = 0.25;
-    val = 1.0;
+
+  // Bright perpendicular curves.
+  float p = mod(a + CONTOUR_A2_WIDTH, CONTOUR_A2_FREQUENCY);
+  if (p <= 2.0*CONTOUR_A2_WIDTH) {
+    float sat2 = abs(p - CONTOUR_A2_WIDTH)/CONTOUR_A2_WIDTH;
+    sat = mix(sat, sat2, 1.0);
+    val = mix(val, 1.0, 0.5);
   } else if (sat < 0.5) {
     val = mix(val, 1.0 - sat, 1.0);
   }
@@ -133,8 +136,7 @@ vec3 complex2hsv(vec2 point) {
   val = clamp(val, CONTOUR_HSV_VALUE_MIN, CONTOUR_HSV_VALUE_MAX);
   return vec3(hue, sat, val);
 #endif
-}
-`;
+}`;
 
 shaderSources.fragmentIncludes.coloring = `
 vec4 hsv2rgba(in vec3 hsv) {
