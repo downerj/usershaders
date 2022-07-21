@@ -45,12 +45,12 @@ class Application {
   constructor(canvas) {
     this.#graphics = new Graphics3D(canvas, this.#mouse);
     let selectedFragment = storage.getLocalItem('selectedProgram');
-    const selectionIsValid = selectedFragment in this.#graphics.availableFragments;
+    const selectionIsValid = this.#graphics.availableFragments.indexOf(selectedFragment) >= 0;
     if (!selectedFragment || !selectionIsValid) {
-      storage.setLocalItem('selectdProgram', Application.#defaultProgram);
+      storage.setLocalItem('selectedProgram', Application.#defaultProgram);
       selectedFragment = Application.#defaultProgram;
     }
-    this.#graphics.setFragment(selectedFragment);
+    this.setFragment(selectedFragment);
   }
   
   run() {
