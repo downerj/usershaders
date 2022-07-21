@@ -61,10 +61,10 @@ vec2 cDiv(vec2 a, vec2 b) {
 
 #define MAX_N 10
 vec2 cPowZ(in vec2 z, in int n) {
-	if (n == 0) {
-		return R;
-	}
-	vec2 res = R;
+  if (n == 0) {
+    return R;
+  }
+  vec2 res = R;
   // Custom replacement for int abs(int) for GLSL 1.00.
   int limit = n < 0 ? -n : n;
   for (int i = 0; i < MAX_N; i++) {
@@ -77,7 +77,7 @@ vec2 cPowZ(in vec2 z, in int n) {
       res = cDiv(res, z);
     }
   }
-	return res;
+  return res;
 }
 
 float cLen(vec2 z) {
