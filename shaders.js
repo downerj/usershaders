@@ -7,15 +7,7 @@ const shaderSources = {
     main: null,
   },
   fragment: {
-    provided: {
-      'Circle': null,
-      'Complex Graph A': null,
-      'Diagonal Lines': null,
-      'Hyperbolas Simple': null,
-      'Hyperbolas Chaotic': null,
-      'Mandelbrot Set': null,
-      'Parabolas': null,
-    },
+    provided: {},
     user: {},
   },
 };
@@ -67,6 +59,27 @@ vec2 cDiv(vec2 a, vec2 b) {
   return vec2((a.x*b.x + a.y*b.y)/d, (a.y*b.x - a.x*b.y)/d);
 }
 
+#define MAX_N 10
+vec2 cPowZ(in vec2 z, in int n) {
+  if (n == 0) {
+    return R;
+  }
+  vec2 res = R;
+  // Custom replacement for int abs(int) for GLSL 1.00.
+  int limit = n < 0 ? -n : n;
+  for (int i = 0; i < MAX_N; i++) {
+    if (i >= limit) {
+      break;
+    }
+    if (n > 1) {
+      res = cMul(res, z);
+    } else {
+      res = cDiv(res, z);
+    }
+  }
+  return res;
+}
+
 float cLen(vec2 z) {
   return sqrt(z.x*z.x + z.y*z.y);
 }
@@ -89,21 +102,62 @@ vec2 cRotate(vec2 z, float degrees) {
   float th = cArg(z);
   return cPolar(r, th + degrees*DEG_TO_RAD);
 }
+#define SATURATION_RATIO 0.0625
+
+#define CONTOURS
+#ifdef CONTOURS
+#define CONTOUR_R_FREQUENCY 2.0
+#define CONTOUR_R_WIDTH 0.25
+#define CONTOUR_A_FREQUENCY 5.0
+#define CONTOUR_A_WIDTH 0.5
+#define CONTOUR_A2_FREQUENCY 20.0
+#define CONTOUR_A2_WIDTH 1.0
+#define CONTOUR_HSV_VALUE_MIN 0.5
+#define CONTOUR_HSV_VALUE_MAX 1.0
+#define CONTOUR_R_MOD 4.0
+#define CONTOUR_R_DIVISOR 8.0
+#endif
 
 vec3 complex2hsv(vec2 point) {
   float x = point.x;
   float y = point.y;
   float r = sqrt(x*x + y*y);
   float a = atan(y, x)*RAD_TO_DEG;
-  
-  const float satRatio = 0.0625;
+
   float hue = a/360.0;
-  float sat = 1.0 - pow(satRatio, r);
-  const float val = 1.0;
-  
+  float sat = 1.0 - pow(SATURATION_RATIO, r);
+#ifndef CONTOURS
+  return vec3(hue, sat, 1.0);
+#else
+  // Dark -> colorful edges.
+  float val = CONTOUR_HSV_VALUE_MIN + mod(r, CONTOUR_R_MOD)/CONTOUR_R_DIVISOR;
+
+  // Perpendicular curves.
+  float n = mod(a + CONTOUR_A_WIDTH, CONTOUR_A_FREQUENCY);
+  if (n <= 2.0*CONTOUR_A_WIDTH) {
+    val = 0.75;
+  }
+
+  // Radial curves.
+  float m = mod(r + CONTOUR_R_WIDTH, CONTOUR_R_FREQUENCY);
+  if (r > 1.0 && m <= 2.0*CONTOUR_R_WIDTH) {
+    val = 0.5;
+  }
+
+  // Bright perpendicular curves.
+  float p = mod(a + CONTOUR_A2_WIDTH, CONTOUR_A2_FREQUENCY);
+  if (p <= 2.0*CONTOUR_A2_WIDTH) {
+    float sat2 = abs(p - CONTOUR_A2_WIDTH)/CONTOUR_A2_WIDTH;
+    sat = mix(sat, sat2, 2.0);
+    val = mix(val, 1.0, 0.5);
+  } else if (sat < 0.5) {
+    val = mix(val, 1.0 - sat, 1.0);
+  }
+
+  val = clamp(val, CONTOUR_HSV_VALUE_MIN, CONTOUR_HSV_VALUE_MAX);
   return vec3(hue, sat, val);
-}
-`;
+#endif
+}`;
 
 shaderSources.fragmentIncludes.coloring = `
 vec4 hsv2rgba(in vec3 hsv) {
@@ -172,10 +226,13 @@ void setColor(out vec4 fragColor, in vec4 fragCoord) {
 ` + shaderSources.fragmentIncludes.main
 ).trim();
 
-shaderSources.fragment.provided['Complex Graph A'] = (
+shaderSources.fragment.provided['Complex Graphs'] = (
   shaderSources.fragmentIncludes.header +
   shaderSources.fragmentIncludes.coloring +
   shaderSources.fragmentIncludes.complex + `
+#define FUNCTION_C
+
+#ifdef FUNCTION_A
 vec2 func(vec2 z) {
   vec2 a = cMul(z, z) - R;
   vec2 b = z - 2.0*R - I;
@@ -184,15 +241,29 @@ vec2 func(vec2 z) {
   vec2 o = cDiv(cMul(a, b2), d);
   return o;
 }
+#elif defined FUNCTION_B
+vec2 func(vec2 z) {
+  return 2.0*I + R + cMul(z, z);
+}
+#elif defined FUNCTION_C
+vec2 func(vec2 z) {
+  return cPowZ(z, 3) - 25.0*R;
+}
+#endif
+
+#define OFFSET_X 0.0
+#define OFFSET_Y 0.0
+#define SCALE 0.10
+#define CYCLE_SPEED 0.0001
 
 void setColor(out vec4 fragColor, in vec4 fragCoord) {
-  vec2 c = resolution*0.5;
-  float scale = 0.1*min(resolution.x, resolution.y);
+  vec2 c = resolution.xy*0.5 + vec2(OFFSET_X, OFFSET_Y);
+  float scale = SCALE*min(resolution.x, resolution.y);
   vec2 z = (fragCoord.xy - c)/scale;
   vec2 o = func(z);
   vec3 hsv = complex2hsv(o);
-  
-  fragColor = hsvCycled2rgba(hsv, 2.0, 1.0/6000.0);
+
+  fragColor = hsvCycled2rgba(hsv, 2.0, CYCLE_SPEED);
 }
 ` + shaderSources.fragmentIncludes.main
 ).trim();

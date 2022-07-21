@@ -40,12 +40,13 @@ class Application {
   #graphics;
   #timer = new IntervalTimer(this.#onTick.bind(this), 10);
   #mouse = {x: 0, y: 0};
-  static #defaultProgram = 'Mandelbrot Set';
+  static #defaultProgram = 'Complex Graphs';
 
   constructor(canvas) {
     this.#graphics = new Graphics3D(canvas, this.#mouse);
     let selectedFragment = storage.getLocalItem('selectedProgram');
-    if (!selectedFragment) {
+    const selectionIsValid = selectedFragment in this.#graphics.availableFragments;
+    if (!selectedFragment || !selectionIsValid) {
       storage.setLocalItem('selectdProgram', Application.#defaultProgram);
       selectedFragment = Application.#defaultProgram;
     }
@@ -132,7 +133,9 @@ window.addEventListener('load', () => {
   const fragmentDropdown = document.getElementById('fragment-dropdown');
   const fragmentInput = document.getElementById('fragment-input');
 
-  for (const fragment of app.availableFragments) {
+  const availableFragments = app.availableFragments;
+  availableFragments.sort();
+  for (const fragment of availableFragments) {
     const option = document.createElement('OPTION');
     option.textContent = fragment;
     option.value = fragment;
