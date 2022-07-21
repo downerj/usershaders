@@ -59,19 +59,23 @@ vec2 cDiv(vec2 a, vec2 b) {
   return vec2((a.x*b.x + a.y*b.y)/d, (a.y*b.x - a.x*b.y)/d);
 }
 
+#define MAX_N 10
 vec2 cPowZ(in vec2 z, in int n) {
 	if (n == 0) {
 		return R;
 	}
 	vec2 res = R;
-	if (n > 1) {
-	  for (int i = 0; i < n; i++) {
-		  res = cMul(res, z);
-   	}
-  } else {
-   	for (int i = 0; i < n; i++) {
-   		res = cDiv(res, z);
-   	}
+  // Custom replacement for int abs(int) for GLSL 1.00.
+  int limit = n < 0 ? -n : n;
+  for (int i = 0; i < MAX_N; i++) {
+    if (i >= limit) {
+      break;
+    }
+    if (n > 1) {
+      res = cMul(res, z);
+    } else {
+      res = cDiv(res, z);
+    }
   }
 	return res;
 }
